@@ -1,0 +1,26 @@
+server.port: 8081
+
+security.basic.enabled: false
+
+spring:
+  application:
+    name: User-Service TEST
+  main:
+    banner-mode: LOG
+  datasource:
+    url: jdbc:h2:mem:userServiceTestDB;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    initialize: true
+    continue-on-error: true
+    platform: h2
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+    hibernate:
+      naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: create-drop
+  error:
+    whitelabel.enabled: true
