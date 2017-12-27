@@ -1,4 +1,4 @@
-
+/*
 insert into T_APPLICATION(code) values('RADAR');
 insert into T_APPLICATION(code) values('SLA');
 
@@ -17,3 +17,4 @@ insert into T_USER_RIGHT(user_id, application_id) values ((select id from T_USER
 
 insert into T_USER_RIGHT_PERIMETER(user_right_id, perimeter_id) values ((select id from T_USER_RIGHT where user_id = (select id from T_USER where login = 'olivier.terrien')), (select id from T_PERIMETER where code ='DEAL'));
 insert into T_USER_RIGHT_PERIMETER(user_right_id, perimeter_id) values ((select id from T_USER_RIGHT where user_id = (select id from T_USER where login = 'olivier.terrien')), (select id from T_PERIMETER where code ='GLE'));
+*/

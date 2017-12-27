@@ -24,7 +24,7 @@ public class UserRightRestController {
                                                                           @RequestParam("perimeter") String perimeter,
                                                                           @RequestParam("privilege") String privilege) throws Exception {
 
-        log.debug(String.format("doesUserOwnPrivilegeForApplicationOnPerimeter? user=%s, application=%s, perimeter=%s, privilege=%s", user, application, perimeter, privilege));
+        log.trace(String.format("doesUserOwnPrivilegeForApplicationOnPerimeter?user=%s,application=%s,perimeter=%s,privilege=%s", user, application, perimeter, privilege));
 
         PerimeterPath perimeterPath = new PerimeterPath.Parser(perimeter).get();
         boolean isGranted = userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeterPath, privilege);
