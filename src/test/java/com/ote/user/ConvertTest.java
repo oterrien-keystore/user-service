@@ -1,17 +1,11 @@
 package com.ote.user;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ote.user.persistence.model.*;
+import com.ote.common.persistence.model.*;
 import com.ote.user.rights.api.Perimeter;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class ConvertTest {

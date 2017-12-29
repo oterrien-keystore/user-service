@@ -4,12 +4,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
+@Disabled
 public class DerecursiveTest {
-
 
     static List<Long> duration = new ArrayList<>();
     static List<Long> duration2 = new ArrayList<>();

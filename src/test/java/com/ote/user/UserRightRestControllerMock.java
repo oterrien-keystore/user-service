@@ -1,6 +1,6 @@
 package com.ote.user;
 
-import com.ote.user.controller.UserRightPayload;
+import com.ote.user.checker.UserRightPayload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;

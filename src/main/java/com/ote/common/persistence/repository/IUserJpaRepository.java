@@ -1,6 +1,6 @@
-package com.ote.user.persistence.repository;
+package com.ote.common.persistence.repository;
 
-import com.ote.user.persistence.model.UserEntity;
+import com.ote.common.persistence.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,6 +8,4 @@ import org.springframework.stereotype.Repository;
 public interface IUserJpaRepository extends JpaRepository<UserEntity, Long> {
 
     UserEntity findByLogin(String login);
-
-    //UserDetails getUserDetails(String userName);
 }

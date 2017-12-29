@@ -1,7 +1,6 @@
-package com.ote.user.persistence.model;
+package com.ote.common.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

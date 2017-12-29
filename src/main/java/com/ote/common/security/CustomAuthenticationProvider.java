@@ -1,6 +1,6 @@
-package com.ote.user.security;
+package com.ote.common.security;
 
-import com.ote.user.service.UserCredentialServiceAdapter;
+import com.ote.credentials.service.UserCredentialServiceAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

@@ -1,4 +1,4 @@
-package com.ote.user.service;
+package com.ote.credentials.service;
 
 import com.ote.user.credentials.api.IUserCredentialService;
 import com.ote.user.credentials.api.UserCredentialServiceProvider;

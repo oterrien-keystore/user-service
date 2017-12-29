@@ -1,5 +1,6 @@
 package com.ote.user;
 
+import com.ote.UserServiceRunner;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

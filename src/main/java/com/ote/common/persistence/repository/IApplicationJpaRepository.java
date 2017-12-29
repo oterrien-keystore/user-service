@@ -1,7 +1,6 @@
-package com.ote.user.persistence.repository;
+package com.ote.common.persistence.repository;
 
-import com.ote.user.persistence.model.ApplicationEntity;
-import com.ote.user.persistence.model.UserEntity;
+import com.ote.common.persistence.model.ApplicationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

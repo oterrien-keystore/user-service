@@ -1,10 +1,10 @@
-package com.ote.user.persistence.repository;
+package com.ote.user.persistence;
 
-import com.ote.user.persistence.model.PerimeterEntity;
-import com.ote.user.persistence.model.UserRightEntity;
-import com.ote.user.persistence.repository.IApplicationJpaRepository;
-import com.ote.user.persistence.repository.IUserJpaRepository;
-import com.ote.user.persistence.repository.IUserRightJpaRepository;
+import com.ote.common.persistence.model.PerimeterEntity;
+import com.ote.common.persistence.model.UserRightEntity;
+import com.ote.common.persistence.repository.IApplicationJpaRepository;
+import com.ote.common.persistence.repository.IUserJpaRepository;
+import com.ote.common.persistence.repository.IUserRightJpaRepository;
 import com.ote.user.rights.api.Perimeter;
 import com.ote.user.rights.spi.IUserRightRepository;
 import org.springframework.beans.factory.annotation.Autowired;

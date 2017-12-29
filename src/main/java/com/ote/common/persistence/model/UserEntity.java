@@ -1,6 +1,5 @@
-package com.ote.user.persistence.model;
+package com.ote.common.persistence.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,10 +22,9 @@ public class UserEntity {
     @Column(name = "LOGIN")
     private String login;
 
-    @Column(name = "PASSWORD")
+    @Column(name = "PASSWORD", nullable = false, length = 128)
     private String password;
 
     @OneToMany(mappedBy = "user")
-    @JsonIgnore
     private List<UserRightEntity> userRights;
 }

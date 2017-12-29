@@ -1,6 +1,6 @@
-package com.ote.user.persistence.repository;
+package com.ote.common.persistence.repository;
 
-import com.ote.user.persistence.model.UserRightEntity;
+import com.ote.common.persistence.model.UserRightEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

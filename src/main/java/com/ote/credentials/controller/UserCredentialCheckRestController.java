@@ -1,5 +1,6 @@
-package com.ote.user.controller;
+package com.ote.credentials.controller;
 
+import com.ote.user.checker.UserCredentialPayload;
 import com.ote.user.credentials.api.IUserCredentialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/credentials")
-public class UserCredentialRestController {
+public class UserCredentialCheckRestController {
 
     @Autowired
     private IUserCredentialService userCredentialService;
@@ -19,6 +20,6 @@ public class UserCredentialRestController {
     public UserCredentialPayload checkCredentials(@RequestParam("user") String user,
                                                   @RequestParam("password") String password) throws Exception {
 
-        return new UserCredentialPayload(user, this.userCredentialService.areCredentialsCorrect(user, password));
+        return new UserCredentialPayload(user, password, this.userCredentialService.areCredentialsCorrect(user, password));
     }
 }
