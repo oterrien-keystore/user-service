@@ -1,5 +1,6 @@
 package com.ote.user.controller;
 
+import com.ote.user.checker.UserRightPayload;
 import com.ote.user.rights.api.IUserRightService;
 import com.ote.user.rights.api.PerimeterPath;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/rights")
 @Slf4j
-public class UserRightRestController {
+public class UserRightCheckRestController {
 
     @Autowired
     private IUserRightService userRightService;
@@ -23,8 +24,6 @@ public class UserRightRestController {
                                                                           @RequestParam("application") String application,
                                                                           @RequestParam("perimeter") String perimeter,
                                                                           @RequestParam("privilege") String privilege) throws Exception {
-
-        log.trace(String.format("doesUserOwnPrivilegeForApplicationOnPerimeter?user=%s,application=%s,perimeter=%s,privilege=%s", user, application, perimeter, privilege));
 
         PerimeterPath perimeterPath = new PerimeterPath.Parser(perimeter).get();
         boolean isGranted = userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeterPath, privilege);

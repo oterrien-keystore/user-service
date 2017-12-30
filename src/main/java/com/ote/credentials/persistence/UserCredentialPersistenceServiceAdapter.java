@@ -1,6 +1,7 @@
-package com.ote.user.persistence.repository;
+package com.ote.credentials.persistence;
 
 import com.ote.user.credentials.spi.IUserCredentialRepository;
+import com.ote.common.persistence.repository.IUserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

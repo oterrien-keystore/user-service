@@ -1,6 +1,5 @@
-package com.ote.user.persistence.model;
+package com.ote.common.persistence.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -24,6 +23,5 @@ public class ApplicationEntity {
     private String code;
 
     @OneToMany(mappedBy = "application")
-    @JsonIgnore
     private List<UserRightEntity> userRights;
 }

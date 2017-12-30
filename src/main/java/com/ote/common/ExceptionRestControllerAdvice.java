@@ -1,4 +1,4 @@
-package com.ote.user.controller;
+package com.ote.common;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

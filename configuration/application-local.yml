@@ -3,10 +3,8 @@ server.port: 8081
 security.basic.enabled: false
 
 spring:
-  application:
-    name: User-Service
-  main:
-    banner-mode: LOG
+  application.name: User-Service
+  main.banner-mode: LOG
   datasource:
     url: jdbc:postgresql://localhost:5432/users
     username: postgres
@@ -24,3 +22,5 @@ spring:
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 #      ddl-auto: none
       ddl-auto: create-drop
+
+page.default.size: 20
