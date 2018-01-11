@@ -1,6 +1,8 @@
 package com.ote.common.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ote.common.controller.PerimeterPayload;
+import com.ote.crud.model.IEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,8 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 @ToString(of = {"code", "perimeters", "privileges"})
-@Table(name = "T_PERIMETER", uniqueConstraints = @UniqueConstraint(name="T_PERIMETER_AK", columnNames = "CODE"))
-public class PerimeterEntity {
+@Table(name = "T_PERIMETER", uniqueConstraints = @UniqueConstraint(name = "T_PERIMETER_AK", columnNames = "CODE"))
+public class PerimeterEntity implements IEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +28,6 @@ public class PerimeterEntity {
 
     @ManyToOne
     @JoinColumn(name = "PARENT_ID")
-    @JsonIgnore // TODO TEMP --> to be removed
     private PerimeterEntity parent;
 
     @OneToMany(mappedBy = "parent")
@@ -37,4 +38,12 @@ public class PerimeterEntity {
             joinColumns = @JoinColumn(name = "PERIMETER_ID", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "PRIVILEGE_ID", referencedColumnName = "ID"))
     private List<PrivilegeEntity> privileges = new ArrayList<>();
+
+    @Override
+    public PerimeterPayload convert() {
+        PerimeterPayload payload = new PerimeterPayload();
+        payload.setId(getId());
+        payload.setCode(getCode());
+        return payload;
+    }
 }

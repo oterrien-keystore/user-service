@@ -1,5 +1,7 @@
 package com.ote.common.persistence.model;
 
+import com.ote.crud.model.IEntity;
+import com.ote.crud.model.IPayload;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,7 +14,7 @@ import java.util.List;
 @Setter
 @ToString(of = {"user", "application", "perimeters"})
 @Table(name = "T_USER_RIGHT", uniqueConstraints = @UniqueConstraint(name="T_USER_RIGHT_AK", columnNames = {"USER_ID", "APPLICATION_ID"}))
-public class UserRightEntity {
+public class UserRightEntity implements IEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,4 +34,9 @@ public class UserRightEntity {
             joinColumns = @JoinColumn(name = "USER_RIGHT_ID", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "PERIMETER_ID", referencedColumnName = "ID"))
     private List<PerimeterEntity> perimeters;
+
+    @Override
+    public <TP extends IPayload> TP convert() {
+        return null;
+    }
 }

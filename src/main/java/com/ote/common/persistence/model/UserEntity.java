@@ -1,5 +1,7 @@
 package com.ote.common.persistence.model;
 
+import com.ote.common.controller.UserPayload;
+import com.ote.crud.model.IEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,7 +14,7 @@ import java.util.List;
 @Setter
 @ToString(of = {"login"})
 @Table(name = "T_USER", uniqueConstraints = @UniqueConstraint(name = "T_USER_AK", columnNames = "LOGIN"))
-public class UserEntity {
+public class UserEntity implements IEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +29,13 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user")
     private List<UserRightEntity> userRights;
+
+    @Override
+    public UserPayload convert() {
+        UserPayload payload = new UserPayload();
+        payload.setId(id);
+        payload.setLogin(login);
+        payload.setPassword(password);
+        return payload;
+    }
 }

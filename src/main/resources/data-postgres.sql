@@ -2,7 +2,7 @@
 insert into T_APPLICATION(code) values('RADAR');
 insert into T_APPLICATION(code) values('SLA');
 
-insert into T_USER(login, password) values('olivier.terrien', 'fb498295cc2562c653db9877d5b6b374f47247be19e659d0b7806e958313a25115c38d36b301fa10d0ab6ed2c761ec8a7eca618c109a029126f5c7fd31e1efb6');//password
+insert into T_USER(login, password) values('olivier.terrien', 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86');//password
 
 insert into T_PRIVILEGE(code) values('READ_ONLY');
 insert into T_PRIVILEGE(code) values('READ_WRITE');

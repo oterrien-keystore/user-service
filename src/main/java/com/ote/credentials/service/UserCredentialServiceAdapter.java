@@ -2,6 +2,7 @@ package com.ote.credentials.service;
 
 import com.ote.user.credentials.api.IUserCredentialService;
 import com.ote.user.credentials.api.UserCredentialServiceProvider;
+import com.ote.user.credentials.api.exception.EncryptingException;
 import com.ote.user.credentials.api.exception.UserNotFoundException;
 import com.ote.user.credentials.spi.IUserCredentialRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class UserCredentialServiceAdapter implements IUserCredentialService {
     public boolean areCredentialsCorrect(String user, String password) {
         try {
             return userCredentialService.areCredentialsCorrect(user, password);
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | EncryptingException e) {
             log.debug(e.getMessage(), e);
             return false;
         }
