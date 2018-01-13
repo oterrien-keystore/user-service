@@ -17,7 +17,7 @@ public class PrivilegePersistenceService implements IPersistenceService<Privileg
     private IEntityRepository<PrivilegeEntity> entityRepository;
 
     @Getter
-    private String entityName = PrivilegePayload.getEntityName();
+    private String entityName = "PRIVILEGE";
 
     @Value("${page.default.size}")
     @Getter

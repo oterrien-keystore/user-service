@@ -1,4 +1,4 @@
-package com.ote.common.persistence.service;
+package com.ote.credentials.service;
 
 import com.ote.user.credentials.api.EncryptorServiceProvider;
 import com.ote.user.credentials.api.IEncryptorService;

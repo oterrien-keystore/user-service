@@ -10,9 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserPayload implements IPayload {
 
-    @Getter
-    public static final String EntityName = "User";
-
     private long id;
 
     private String login;

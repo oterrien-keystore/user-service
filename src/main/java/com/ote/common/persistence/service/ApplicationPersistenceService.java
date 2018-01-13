@@ -17,7 +17,7 @@ public class ApplicationPersistenceService implements IPersistenceService<Applic
     private IEntityRepository<ApplicationEntity> entityRepository;
 
     @Getter
-    private String entityName = ApplicationPayload.getEntityName();
+    private String entityName = "APPLICATION";
 
     @Value("${page.default.size}")
     @Getter

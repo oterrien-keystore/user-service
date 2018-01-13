@@ -12,9 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class PerimeterPayload implements IPayload {
 
-    @Getter
-    public static final String EntityName = "Application";
-
     private long id;
 
     private String code;

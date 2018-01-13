@@ -27,7 +27,7 @@ public class UserPersistenceService implements IPersistenceService<UserPayload> 
     private IEncryptorService encryptorService;
 
     @Getter
-    private String entityName = UserPayload.getEntityName();
+    private String entityName = "USER";
 
     @Value("${page.default.size}")
     @Getter

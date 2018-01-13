@@ -7,14 +7,20 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @ToString(of = {"login"})
-@Table(name = "T_USER", uniqueConstraints = @UniqueConstraint(name = "T_USER_AK", columnNames = "LOGIN"))
-public class UserEntity implements IEntity {
+@Table(name = "USERS", uniqueConstraints = @UniqueConstraint(name = "USERS_AK", columnNames = "LOGIN"))
+@NamedEntityGraph(name = "userWithUserRightsAndDetails",
+        attributeNodes = @NamedAttributeNode(value = "userRights", subgraph = "userRightsAndDetails"),
+        subgraphs = @NamedSubgraph(name = "userRightsAndDetails", attributeNodes = @NamedAttributeNode("details")))
+public class UserEntity implements IEntity, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +34,7 @@ public class UserEntity implements IEntity {
     private String password;
 
     @OneToMany(mappedBy = "user")
-    private List<UserRightEntity> userRights;
+    private Set<UserRightEntity> userRights;
 
     @Override
     public UserPayload convert() {

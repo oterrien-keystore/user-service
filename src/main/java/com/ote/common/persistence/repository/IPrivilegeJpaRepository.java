@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IPrivilegeJpaRepository extends IEntityRepository<PrivilegeEntity> {
 
+    boolean existsByCode(String code);
+
+    PrivilegeEntity findByCode(String code);
 }

@@ -1,6 +1,5 @@
 package com.ote.common.persistence.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ote.common.controller.PerimeterPayload;
 import com.ote.crud.model.IEntity;
 import lombok.Getter;
@@ -8,15 +7,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@ToString(of = {"code", "perimeters", "privileges"})
-@Table(name = "T_PERIMETER", uniqueConstraints = @UniqueConstraint(name = "T_PERIMETER_AK", columnNames = "CODE"))
-public class PerimeterEntity implements IEntity {
+@ToString(of = {"code"})
+@Table(name = "PERIMETERS", uniqueConstraints = @UniqueConstraint(name = "PERIMETERS_AK", columnNames = "CODE"))
+public class PerimeterEntity implements IEntity, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +30,7 @@ public class PerimeterEntity implements IEntity {
     private PerimeterEntity parent;
 
     @OneToMany(mappedBy = "parent")
-    private List<PerimeterEntity> perimeters;
-
-    @ManyToMany
-    @JoinTable(name = "T_PERIMETER_PRIVILEGE",
-            joinColumns = @JoinColumn(name = "PERIMETER_ID", referencedColumnName = "ID"),
-            inverseJoinColumns = @JoinColumn(name = "PRIVILEGE_ID", referencedColumnName = "ID"))
-    private List<PrivilegeEntity> privileges = new ArrayList<>();
+    private Set<PerimeterEntity> perimeters;
 
     @Override
     public PerimeterPayload convert() {

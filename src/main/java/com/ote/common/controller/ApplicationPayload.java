@@ -10,9 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ApplicationPayload implements IPayload {
 
-    @Getter
-    public static final String EntityName = "Application";
-
     private long id;
 
     private String code;

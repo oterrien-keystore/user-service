@@ -2,6 +2,7 @@ package com.ote.common.security;
 
 import com.ote.credentials.service.UserCredentialServiceAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
-@Service
+@Configuration
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired

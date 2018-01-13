@@ -1,6 +1,5 @@
 package com.ote.credentials.controller;
 
-import com.ote.user.checker.UserCredentialPayload;
 import com.ote.user.credentials.api.IUserCredentialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,9 +16,9 @@ public class UserCredentialCheckRestController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public UserCredentialPayload checkCredentials(@RequestParam("user") String user,
-                                                  @RequestParam("password") String password) throws Exception {
+    public boolean checkCredentials(@RequestParam("user") String user,
+                                    @RequestParam("password") String password) throws Exception {
 
-        return new UserCredentialPayload(user, password, this.userCredentialService.areCredentialsCorrect(user, password));
+        return userCredentialService.areCredentialsCorrect(user, password);
     }
 }

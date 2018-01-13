@@ -1,11 +1,9 @@
 package com.ote.credentials.persistence;
 
-import com.ote.user.credentials.spi.IUserCredentialRepository;
 import com.ote.common.persistence.repository.IUserJpaRepository;
+import com.ote.user.credentials.spi.IUserCredentialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class UserCredentialPersistenceServiceAdapter implements IUserCredentialRepository {
@@ -15,7 +13,7 @@ public class UserCredentialPersistenceServiceAdapter implements IUserCredentialR
 
     @Override
     public boolean isUserDefined(String user) {
-        return Optional.ofNullable(userJpaRepository.findByLogin(user)).isPresent();
+        return userJpaRepository.existsByLogin(user);
     }
 
     @Override

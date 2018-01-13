@@ -17,7 +17,7 @@ public class PerimeterPersistenceService implements IPersistenceService<Perimete
     private IEntityRepository<PerimeterEntity> entityRepository;
 
     @Getter
-    private String entityName = PerimeterPayload.getEntityName();
+    private String entityName = "PERIMETER";
 
     @Value("${page.default.size}")
     @Getter

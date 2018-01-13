@@ -7,13 +7,14 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Getter
 @Setter
 @ToString(of = "code")
-@Table(name = "T_PRIVILEGE", uniqueConstraints = @UniqueConstraint(name = "T_PRIVILEGE_AK", columnNames = "CODE"))
-public class PrivilegeEntity implements IEntity {
+@Table(name = "PRIVILEGES", uniqueConstraints = @UniqueConstraint(name = "PRIVILEGES_AK", columnNames = "CODE"))
+public class PrivilegeEntity implements IEntity, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

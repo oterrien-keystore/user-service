@@ -2,6 +2,7 @@ package com.ote.user;
 
 import com.ote.common.persistence.model.*;
 import com.ote.user.rights.api.Perimeter;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -11,9 +12,10 @@ import java.util.stream.Collectors;
 public class ConvertTest {
 
     @Test
+    @Disabled
     public void testConvert() {
 
-        ApplicationEntity application = new ApplicationEntity();
+        /*ApplicationEntity application = new ApplicationEntity();
         application.setCode("SLA");
 
         UserEntity user = new UserEntity();
@@ -48,14 +50,14 @@ public class ConvertTest {
         perimeters.addAll(userRightEntity.getPerimeters().stream().map(p -> convert(p)).collect(Collectors.toList()));
 
         System.out.println(userRightEntity.getPerimeters());
-        System.out.println(perimeters);
+        System.out.println(perimeters);*/
 
     }
 
-    private Perimeter convert(PerimeterEntity entity) {
+    /*private Perimeter convert(PerimeterEntity entity) {
         Perimeter perimeter = new Perimeter(entity.getCode());
         perimeter.getPrivileges().addAll(entity.getPrivileges().stream().map(p -> p.getCode()).collect(Collectors.toList()));
         perimeter.getPerimeters().addAll(entity.getPerimeters().stream().map(p -> convert(p)).collect(Collectors.toList()));
         return perimeter;
-    }
+    }*/
 }

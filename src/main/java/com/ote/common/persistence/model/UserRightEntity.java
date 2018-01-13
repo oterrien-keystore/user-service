@@ -7,14 +7,16 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.List;
+import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@ToString(of = {"user", "application", "perimeters"})
-@Table(name = "T_USER_RIGHT", uniqueConstraints = @UniqueConstraint(name="T_USER_RIGHT_AK", columnNames = {"USER_ID", "APPLICATION_ID"}))
-public class UserRightEntity implements IEntity {
+@ToString(of = {"user", "application"})
+@Table(name = "USER_RIGHTS", uniqueConstraints = @UniqueConstraint(name = "USER_RIGHTS_AK", columnNames = {"USER_ID", "APPLICATION_ID"}))
+@NamedEntityGraph(name = "userRightWithDetails", attributeNodes = @NamedAttributeNode(value = "details"))
+public class UserRightEntity implements IEntity, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +31,8 @@ public class UserRightEntity implements IEntity {
     @JoinColumn(name = "APPLICATION_ID")
     private ApplicationEntity application;
 
-    @ManyToMany
-    @JoinTable(name = "T_USER_RIGHT_PERIMETER",
-            joinColumns = @JoinColumn(name = "USER_RIGHT_ID", referencedColumnName = "ID"),
-            inverseJoinColumns = @JoinColumn(name = "PERIMETER_ID", referencedColumnName = "ID"))
-    private List<PerimeterEntity> perimeters;
+    @OneToMany(mappedBy = "userRight")
+    private Set<UserRightDetailEntity> details;
 
     @Override
     public <TP extends IPayload> TP convert() {

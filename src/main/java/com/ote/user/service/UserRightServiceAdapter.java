@@ -9,8 +9,10 @@ import com.ote.user.rights.api.exception.UserNotFoundException;
 import com.ote.user.rights.spi.IUserRightRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+@Profile("!mockUserRight")
 @Service
 @Slf4j
 public class UserRightServiceAdapter implements IUserRightService {
@@ -22,12 +24,7 @@ public class UserRightServiceAdapter implements IUserRightService {
     }
 
     @Override
-    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, PerimeterPath perimeterPath, String privilege) {
-        try {
-            return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeterPath, privilege);
-        } catch (UserNotFoundException | ApplicationNotFoundException | RoleNotFoundException e) {
-            log.debug(e.getMessage(), e);
-            return false;
-        }
+    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, PerimeterPath perimeterPath, String privilege) throws UserNotFoundException, ApplicationNotFoundException, RoleNotFoundException {
+        return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeterPath, privilege);
     }
 }

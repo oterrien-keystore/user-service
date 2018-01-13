@@ -2,20 +2,23 @@ package com.ote.common.persistence.model;
 
 import com.ote.common.controller.ApplicationPayload;
 import com.ote.crud.model.IEntity;
-import com.ote.crud.model.IPayload;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.List;
+import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @ToString(of = "code")
-@Table(name = "T_APPLICATION", uniqueConstraints = @UniqueConstraint(name="T_APPLICATION_AK", columnNames = "CODE"))
-public class ApplicationEntity implements IEntity{
+@Table(name = "APPLICATIONS", uniqueConstraints = @UniqueConstraint(name = "APPLICATIONS_AK", columnNames = "CODE"))
+@NamedEntityGraph(name = "applicationWithUserRightsAndDetails",
+        attributeNodes = @NamedAttributeNode(value = "userRights", subgraph = "userRightsAndDetails"),
+        subgraphs = @NamedSubgraph(name = "userRightsAndDetails", attributeNodes = @NamedAttributeNode("details")))
+public class ApplicationEntity implements IEntity, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +29,7 @@ public class ApplicationEntity implements IEntity{
     private String code;
 
     @OneToMany(mappedBy = "application")
-    private List<UserRightEntity> userRights;
+    private Set<UserRightEntity> userRights;
 
     @Override
     public ApplicationPayload convert() {
