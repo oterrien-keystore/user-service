@@ -1,23 +1,26 @@
 package com.ote.common.controller;
 
-import com.ote.common.persistence.model.ApplicationEntity;
-import com.ote.crud.model.IPayload;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
-public class UserRightPayload implements IPayload {
+public class UserRightPayload {
 
     private long id;
 
-    private String code;
+    private String user;
 
-    @Override
-    public ApplicationEntity convert() {
-        ApplicationEntity entity = new ApplicationEntity();
-        entity.setId(getId());
-        entity.setCode(getCode());
-        return entity;
+    private String application;
+
+    private List<Detail> details;
+
+    @NoArgsConstructor
+    public static class Detail {
+        private String perimeter;
+        private List<String> privileges;
     }
 }

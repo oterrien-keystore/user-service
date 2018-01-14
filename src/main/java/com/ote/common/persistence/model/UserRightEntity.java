@@ -1,7 +1,5 @@
 package com.ote.common.persistence.model;
 
-import com.ote.crud.model.IEntity;
-import com.ote.crud.model.IPayload;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,7 +14,7 @@ import java.util.Set;
 @ToString(of = {"user", "application"})
 @Table(name = "USER_RIGHTS", uniqueConstraints = @UniqueConstraint(name = "USER_RIGHTS_AK", columnNames = {"USER_ID", "APPLICATION_ID"}))
 @NamedEntityGraph(name = "userRightWithDetails", attributeNodes = @NamedAttributeNode(value = "details"))
-public class UserRightEntity implements IEntity, Serializable {
+public class UserRightEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,9 +31,4 @@ public class UserRightEntity implements IEntity, Serializable {
 
     @OneToMany(mappedBy = "userRight")
     private Set<UserRightDetailEntity> details;
-
-    @Override
-    public <TP extends IPayload> TP convert() {
-        return null;
-    }
 }

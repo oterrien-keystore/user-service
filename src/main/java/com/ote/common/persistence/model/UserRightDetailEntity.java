@@ -6,12 +6,14 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@ToString(of = {"userRight", "perimeter", "privilege"})
-@Table(name = "USER_RIGHT_DETAILS")
+@ToString(of = {"userRight", "perimeter", "privileges"})
+@Table(name = "USER_RIGHTS_PERIMETERS")
 public class UserRightDetailEntity implements Serializable {
 
     @Id
@@ -26,6 +28,9 @@ public class UserRightDetailEntity implements Serializable {
     @OneToOne
     private PerimeterEntity perimeter;
 
-    @OneToOne
-    private PrivilegeEntity privilege;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "USER_RIGHTS_PRIVILEGES_BY_PERIMETER",
+            joinColumns = @JoinColumn(name = "USER_RIGHTS_PERIMETERS_ID", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "PRIVILEGE_ID", referencedColumnName = "ID"))
+    private Set<PrivilegeEntity> privileges;
 }

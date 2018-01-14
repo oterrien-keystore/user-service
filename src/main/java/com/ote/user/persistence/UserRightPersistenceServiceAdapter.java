@@ -1,5 +1,6 @@
 package com.ote.user.persistence;
 
+import com.ote.common.persistence.model.PrivilegeEntity;
 import com.ote.common.persistence.model.UserRightDetailEntity;
 import com.ote.common.persistence.model.UserRightEntity;
 import com.ote.common.persistence.repository.IApplicationJpaRepository;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserRightPersistenceServiceAdapter implements IUserRightRepository {
@@ -54,13 +56,12 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
     private Map<String, Perimeter> groupByCode(Collection<UserRightDetailEntity> details) {
         Map<String, Perimeter> perimeters = new HashMap<>();
         details.stream().
-                forEach(detailEntity -> {
-                    String code = detailEntity.getPerimeter().getCode();
+                map(detailEntity -> detailEntity.getPerimeter().getCode()).
+                forEach(code -> {
                     if (!perimeters.containsKey(code)) {
                         perimeters.put(code, new Perimeter(code));
                     }
                 });
-
         return perimeters;
     }
 
@@ -78,12 +79,13 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
     }
 
     private void setPrivileges(Collection<UserRightDetailEntity> details, Map<String, Perimeter> perimeters) {
-        details.stream().
-                forEach(detailEntity -> {
-                    String code = detailEntity.getPerimeter().getCode();
-                    Perimeter perimeter = perimeters.get(code);
-                    perimeter.getPrivileges().add(detailEntity.getPrivilege().getCode());
-                });
+        details.forEach(detailEntity -> {
+            String code = detailEntity.getPerimeter().getCode();
+            Perimeter perimeter = perimeters.get(code);
+            perimeter.getPrivileges().addAll(detailEntity.getPrivileges().stream().
+                    map(PrivilegeEntity::getCode).
+                    collect(Collectors.toList()));
+        });
     }
 
 }

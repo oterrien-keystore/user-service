@@ -1,6 +1,7 @@
 package com.ote.user;
 
-import com.ote.user.checker.UserRightPayload;
+import com.ote.common.JsonUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @Service
 @Profile("Test")
+@Slf4j
 public class UserRightRestControllerMock {
 
     private static final String URI = "/api/v1/rights";
@@ -18,7 +20,11 @@ public class UserRightRestControllerMock {
     @Autowired
     private WebConfigurationMock webConfiguration;
 
-    public UserRightPayload doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, String perimeter, String privilege) {
+    public UserRightRestControllerMock() {
+        log.warn("###### MOCK ##### " + this.getClass().getSimpleName());
+    }
+
+    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, String perimeter, String privilege) {
         try {
             MvcResult result = webConfiguration.getMockMvc().perform(get(URI).
                     contentType(MediaType.APPLICATION_JSON_VALUE).
@@ -28,7 +34,7 @@ public class UserRightRestControllerMock {
                     param("privilege", privilege)).
                     andReturn();
 
-            return JsonUtils.parse(result.getResponse().getContentAsString(), UserRightPayload.class);
+            return JsonUtils.parse(result.getResponse().getContentAsString(), Boolean.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

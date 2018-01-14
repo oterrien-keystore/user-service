@@ -1,4 +1,4 @@
-package com.ote.mock;
+package com.ote.user;
 
 import com.ote.common.persistence.model.*;
 import com.ote.common.persistence.repository.*;
@@ -8,7 +8,6 @@ import com.ote.user.rights.api.PerimeterPath;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -19,16 +18,13 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-@Profile("mockUserRightData")
+@Profile("Test")
 @Service
 @Slf4j
 public class UserRightDataInitializerMock {
 
     @Autowired
     private IEncryptorService encryptorService;
-
-    @Value("${spring.application.name}")
-    private String applicationName;
 
     @Autowired
     private IUserJpaRepository userRepository;
@@ -56,30 +52,22 @@ public class UserRightDataInitializerMock {
     public void init() throws Exception {
 
         // Create Users
-        createUsers(
-                new User("olivier.terrien", "password"),
-                new User("maryline.terrien", "password"));
+        createUsers(new User("user1", "password"), new User("user2", "password"));
 
         // Create Applications
-        createApplications(applicationName, "TEST_SERVICE");
+        createApplications("TEST_SERVICE");
 
         // Create Perimeters
-        createPerimeters(
-                "APPLICATION", "USER", "PERIMETER", "PRIVILEGE",
-                "DEAL", "DEAL/GLE");
+        createPerimeters("PARENT", "PARENT/CHILD");
 
         // Create Privileges
         createPrivileges("READ", "WRITE");
 
         //Create UserRights
         createUserRights(
-                new UserRight("olivier.terrien", applicationName, "APPLICATION", "READ", "WRITE"),
-                new UserRight("olivier.terrien", applicationName, "USER", "READ"),
-                new UserRight("olivier.terrien", applicationName, "PERIMETER", "READ"),
-                new UserRight("olivier.terrien", applicationName, "PRIVILEGE", "READ"),
-                new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL", "READ"),
-                new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL/GLE", "WRITE"),
-                new UserRight("maryline.terrien", "TEST_SERVICE", "DEAL/GLE", "READ")
+                new UserRight("user1", "TEST_SERVICE", "PARENT", "READ"),
+                new UserRight("user1", "TEST_SERVICE", "PARENT/CHILD", "WRITE"),
+                new UserRight("user2", "TEST_SERVICE", "PARENT/CHILD", "READ")
         );
     }
 

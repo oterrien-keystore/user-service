@@ -24,3 +24,5 @@ spring:
       ddl-auto: create-drop
   error:
     whitelabel.enabled: true
+
+page.default.size: 20
