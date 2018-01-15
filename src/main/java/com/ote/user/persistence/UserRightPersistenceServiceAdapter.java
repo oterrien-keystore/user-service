@@ -1,11 +1,7 @@
 package com.ote.user.persistence;
 
-import com.ote.common.persistence.model.PrivilegeEntity;
-import com.ote.common.persistence.model.UserRightDetailEntity;
-import com.ote.common.persistence.model.UserRightEntity;
-import com.ote.common.persistence.repository.IApplicationJpaRepository;
-import com.ote.common.persistence.repository.IUserJpaRepository;
-import com.ote.common.persistence.repository.IUserRightJpaRepository;
+import com.ote.common.persistence.model.*;
+import com.ote.common.persistence.repository.*;
 import com.ote.user.rights.api.Perimeter;
 import com.ote.user.rights.spi.IUserRightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +13,24 @@ import java.util.stream.Collectors;
 @Service
 public class UserRightPersistenceServiceAdapter implements IUserRightRepository {
 
-    @Autowired
-    private IUserRightJpaRepository userRightJpaRepository;
 
     @Autowired
     private IUserJpaRepository userJpaRepository;
 
     @Autowired
     private IApplicationJpaRepository applicationJpaRepository;
+
+    @Autowired
+    private IUserRightJpaRepository userRightJpaRepository;
+
+    @Autowired
+    private ISecurityGroupJpaRepository securityGroupRepository;
+
+    @Autowired
+    private ISecurityGroupRightJpaRepository securityGroupRightRepository;
+
+    @Autowired
+    private ISecurityGroupRightDetailJpaRepository securityGroupRightDetailRepository;
 
     @Override
     public boolean isUserDefined(String user) {
@@ -44,48 +50,57 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
     @Override
     public List<Perimeter> getPerimeters(String user, String application) {
 
+        // Retrieve user's rights for the given application
         UserRightEntity userRightEntity = userRightJpaRepository.getByUserLoginAndApplicationCode(user, application);
+        Set<IRightDetail> rightDetails = new HashSet<>(userRightEntity.getDetails());
 
-        Map<String, Perimeter> perimeters = groupByCode(userRightEntity.getDetails());
-        setParents(userRightEntity.getDetails(), perimeters);
-        setPrivileges(userRightEntity.getDetails(), perimeters);
+        // Retrieve user's rights inherited from its securityGroups for the given application
+        UserEntity userEntity = userJpaRepository.findByLogin(user);
+        List<SecurityGroupRightEntity> securityGroupRights = securityGroupRightRepository.findByUserAndApplicationCode(userEntity, application);
+        rightDetails.addAll(securityGroupRights.stream().map(SecurityGroupRightEntity::getDetails).flatMap(Collection::stream).collect(Collectors.toSet()));
 
-        return new ArrayList<>(perimeters.values());
+        return new PerimeterAggregator(rightDetails).getPerimeters();
     }
 
-    private Map<String, Perimeter> groupByCode(Collection<UserRightDetailEntity> details) {
-        Map<String, Perimeter> perimeters = new HashMap<>();
-        details.stream().
-                map(detailEntity -> detailEntity.getPerimeter().getCode()).
-                forEach(code -> {
-                    if (!perimeters.containsKey(code)) {
-                        perimeters.put(code, new Perimeter(code));
-                    }
-                });
-        return perimeters;
+    private class PerimeterAggregator {
+
+        private Map<String, Perimeter> perimeters = new HashMap<>();
+
+        public PerimeterAggregator(Set<IRightDetail> details) {
+            // Split Perimeter by code
+            details.stream().
+                    map(detailEntity -> detailEntity.getPerimeter().getCode()).
+                    forEach(code -> {
+                        if (!perimeters.containsKey(code)) {
+                            perimeters.put(code, new Perimeter(code));
+                        }
+                    });
+
+            details.stream().
+                    // Add privileges foreach
+                    peek(detailEntity -> {
+                        String code = detailEntity.getPerimeter().getCode();
+                        Perimeter perimeter = perimeters.get(code);
+                        perimeter.getPrivileges().addAll(detailEntity.getPrivileges().stream().
+                                map(PrivilegeEntity::getCode).
+                                collect(Collectors.toList()));
+                    }).
+                    // Set parent if any (need map already built)
+                    filter(detailEntity -> Optional.ofNullable(detailEntity.getPerimeter().getParent()).isPresent()).
+                    filter(detailEntity -> perimeters.containsKey(detailEntity.getPerimeter().getParent().getCode())).
+                    forEach(detailEntity -> {
+                        String code = detailEntity.getPerimeter().getCode();
+                        String parent = detailEntity.getPerimeter().getParent().getCode();
+                        Perimeter perimeter = perimeters.get(code);
+                        Perimeter parentPerimeter = perimeters.get(parent);
+                        parentPerimeter.getPerimeters().add(perimeter);
+                    });
+        }
+
+        public List<Perimeter> getPerimeters() {
+            return new ArrayList<>(perimeters.values());
+        }
     }
 
-    private void setParents(Collection<UserRightDetailEntity> details, Map<String, Perimeter> perimeters) {
-        details.stream().
-                filter(detailEntity -> Optional.ofNullable(detailEntity.getPerimeter().getParent()).isPresent()).
-                filter(detailEntity -> perimeters.containsKey(detailEntity.getPerimeter().getParent().getCode())).
-                forEach(detailEntity -> {
-                    String code = detailEntity.getPerimeter().getCode();
-                    String parent = detailEntity.getPerimeter().getParent().getCode();
-                    Perimeter perimeter = perimeters.get(code);
-                    Perimeter parentPerimeter = perimeters.get(parent);
-                    parentPerimeter.getPerimeters().add(perimeter);
-                });
-    }
-
-    private void setPrivileges(Collection<UserRightDetailEntity> details, Map<String, Perimeter> perimeters) {
-        details.forEach(detailEntity -> {
-            String code = detailEntity.getPerimeter().getCode();
-            Perimeter perimeter = perimeters.get(code);
-            perimeter.getPrivileges().addAll(detailEntity.getPrivileges().stream().
-                    map(PrivilegeEntity::getCode).
-                    collect(Collectors.toList()));
-        });
-    }
 
 }

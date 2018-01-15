@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString(of = "code")
-@Table(name = "PRIVILEGES", uniqueConstraints = @UniqueConstraint(name = "PRIVILEGES_AK", columnNames = "CODE"))
+@Table(name = "T_PRIVILEGE", uniqueConstraints = @UniqueConstraint(name = "AK_PRIVILEGE", columnNames = "CODE"))
 public class PrivilegeEntity implements IEntity, Serializable {
 
     @Id

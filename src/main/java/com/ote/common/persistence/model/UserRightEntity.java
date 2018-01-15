@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(of = {"user", "application"})
-@Table(name = "USER_RIGHTS", uniqueConstraints = @UniqueConstraint(name = "USER_RIGHTS_AK", columnNames = {"USER_ID", "APPLICATION_ID"}))
+@Table(name = "T_USER_RIGHT", uniqueConstraints = @UniqueConstraint(name = "AK_USER_RIGHT", columnNames = {"USER_ID", "APPLICATION_ID"}))
 @NamedEntityGraph(name = "userRightWithDetails", attributeNodes = @NamedAttributeNode(value = "details"))
 public class UserRightEntity implements Serializable {
 

@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(of = {"code"})
-@Table(name = "PERIMETERS", uniqueConstraints = @UniqueConstraint(name = "PERIMETERS_AK", columnNames = "CODE"))
+@Table(name = "T_PERIMETER", uniqueConstraints = @UniqueConstraint(name = "AK_PERIMETER", columnNames = "CODE"))
 public class PerimeterEntity implements IEntity, Serializable {
 
     @Id

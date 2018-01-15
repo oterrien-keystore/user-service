@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(of = "code")
-@Table(name = "APPLICATIONS", uniqueConstraints = @UniqueConstraint(name = "APPLICATIONS_AK", columnNames = "CODE"))
+@Table(name = "T_APPLICATION", uniqueConstraints = @UniqueConstraint(name = "AK_APPLICATION", columnNames = "CODE"))
 @NamedEntityGraph(name = "applicationWithUserRightsAndDetails",
         attributeNodes = @NamedAttributeNode(value = "userRights", subgraph = "userRightsAndDetails"),
         subgraphs = @NamedSubgraph(name = "userRightsAndDetails", attributeNodes = @NamedAttributeNode("details")))

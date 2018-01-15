@@ -4,6 +4,7 @@ import com.ote.common.persistence.model.*;
 import com.ote.common.persistence.repository.*;
 import com.ote.user.credentials.api.IEncryptorService;
 import com.ote.user.credentials.api.exception.EncryptingException;
+import com.ote.user.persistence.UserRightPersistenceServiceAdapter;
 import com.ote.user.rights.api.PerimeterPath;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,18 @@ public class UserRightDataInitializerMock {
     @Autowired
     private IUserRightDetailJpaRepository userRightDetailRepository;
 
+    @Autowired
+    private ISecurityGroupJpaRepository securityGroupRepository;
+
+    @Autowired
+    private ISecurityGroupRightJpaRepository securityGroupRightRepository;
+
+    @Autowired
+    private ISecurityGroupRightDetailJpaRepository securityGroupRightDetailRepository;
+
+    @Autowired
+    private UserRightPersistenceServiceAdapter userRightPersistenceServiceAdapter;
+
     public UserRightDataInitializerMock() {
         log.warn("###### MOCK ##### " + this.getClass().getSimpleName());
     }
@@ -71,9 +84,15 @@ public class UserRightDataInitializerMock {
         // Create Privileges
         createPrivileges("READ", "WRITE");
 
-        //Create UserRights
+        // Create Security Group
+        createSecurityGroup(new SecurityGroup("USER_RIGHT_CONTRIBUTORS", "olivier.terrien"));
+
+        // Create Security Group Rights
+        createSecurityGroupRight(new SecurityGroupRight("USER_RIGHT_CONTRIBUTORS", applicationName, "APPLICATION", "READ"));
+
+        //Create User Rights
         createUserRights(
-                new UserRight("olivier.terrien", applicationName, "APPLICATION", "READ", "WRITE"),
+                new UserRight("olivier.terrien", applicationName, "APPLICATION", "WRITE"),
                 new UserRight("olivier.terrien", applicationName, "USER", "READ"),
                 new UserRight("olivier.terrien", applicationName, "PERIMETER", "READ"),
                 new UserRight("olivier.terrien", applicationName, "PRIVILEGE", "READ"),
@@ -81,6 +100,8 @@ public class UserRightDataInitializerMock {
                 new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL/GLE", "WRITE"),
                 new UserRight("maryline.terrien", "TEST_SERVICE", "DEAL/GLE", "READ")
         );
+
+        log.info("###### MOCK ##### " + userRightPersistenceServiceAdapter.getPerimeters("olivier.terrien", applicationName).toString());
     }
 
     private void createUsers(User... users) {
@@ -166,6 +187,67 @@ public class UserRightDataInitializerMock {
                     userRightDetailRepository.save(detail);
                     userRightDetailRepository.flush();
                 });
+    }
+
+    private void createSecurityGroup(SecurityGroup... securityGroups) {
+        Arrays.asList(securityGroups).
+                forEach(p -> {
+                    SecurityGroupEntity securityGroupEntity = new SecurityGroupEntity();
+                    securityGroupEntity.setCode(p.code);
+                    securityGroupEntity.setUsers(p.users.stream().map(u -> userRepository.findByLogin(u)).collect(Collectors.toSet()));
+                    if (!securityGroupRepository.existsByCode(p.code)) {
+                        securityGroupRepository.save(securityGroupEntity);
+                        securityGroupRepository.flush();
+                    }
+                });
+    }
+
+    private void createSecurityGroupRight(SecurityGroupRight... securityGroupRights) {
+        Arrays.asList(securityGroupRights).
+                forEach(p -> {
+                    SecurityGroupEntity securityGroup = securityGroupRepository.findByCode(p.code);
+                    SecurityGroupRightEntity securityGroupRightEntity = new SecurityGroupRightEntity();
+                    securityGroupRightEntity.setSecurityGroup(securityGroup);
+                    securityGroupRightEntity.setApplication(applicationRepository.findByCode(p.application));
+                    if (!securityGroupRightRepository.existsBySecurityGroupCodeAndApplicationCode(p.code, p.application)) {
+                        securityGroupRightRepository.save(securityGroupRightEntity);
+                        securityGroupRightRepository.flush();
+                    }
+                    PerimeterPath perimeterPath = new PerimeterPath.Parser(p.perimeter).get();
+                    String perimeter = perimeterPath.getPath()[perimeterPath.getPath().length - 1];
+                    Set<PrivilegeEntity> privilegeEntities = p.privileges.stream().map(pp -> privilegeRepository.findByCode(pp)).collect(Collectors.toSet());
+
+                    SecurityGroupRightDetailEntity detail = new SecurityGroupRightDetailEntity();
+                    detail.setSecurityGroupRight(securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCode(p.code, p.application));
+                    detail.setPerimeter(perimeterRepository.findByCode(perimeter));
+                    detail.setPrivileges(privilegeEntities);
+                    securityGroupRightDetailRepository.save(detail);
+                    securityGroupRightDetailRepository.flush();
+                });
+    }
+
+    private class SecurityGroup {
+        private final String code;
+        private final List<String> users;
+
+        public SecurityGroup(String code, String... users) {
+            this.code = code;
+            this.users = Arrays.asList(users);
+        }
+    }
+
+    private class SecurityGroupRight {
+        private final String code;
+        private final String application;
+        private final String perimeter;
+        private final List<String> privileges;
+
+        public SecurityGroupRight(String code, String application, String perimeter, String... privileges) {
+            this.code = code;
+            this.application = application;
+            this.perimeter = perimeter;
+            this.privileges = Arrays.asList(privileges);
+        }
     }
 
     @RequiredArgsConstructor
