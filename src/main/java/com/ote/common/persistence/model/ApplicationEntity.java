@@ -2,6 +2,7 @@ package com.ote.common.persistence.model;
 
 import com.ote.common.controller.ApplicationPayload;
 import com.ote.crud.model.IEntity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,10 +15,8 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(of = "code")
+@EqualsAndHashCode(of = "code")
 @Table(name = "T_APPLICATION", uniqueConstraints = @UniqueConstraint(name = "AK_APPLICATION", columnNames = "CODE"))
-@NamedEntityGraph(name = "applicationWithUserRightsAndDetails",
-        attributeNodes = @NamedAttributeNode(value = "userRights", subgraph = "userRightsAndDetails"),
-        subgraphs = @NamedSubgraph(name = "userRightsAndDetails", attributeNodes = @NamedAttributeNode("details")))
 public class ApplicationEntity implements IEntity, Serializable {
 
     @Id
@@ -25,7 +24,7 @@ public class ApplicationEntity implements IEntity, Serializable {
     @Column(name = "ID")
     private long id;
 
-    @Column(name = "CODE")
+    @Column(name = "CODE", nullable = false)
     private String code;
 
     @OneToMany(mappedBy = "application")

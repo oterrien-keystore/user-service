@@ -2,6 +2,7 @@ package com.ote.common.persistence.model;
 
 import com.ote.common.controller.UserPayload;
 import com.ote.crud.model.IEntity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,11 +14,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@ToString(of = {"login"})
+@ToString(of = "login")
+@EqualsAndHashCode(of = "login")
 @Table(name = "T_USER", uniqueConstraints = @UniqueConstraint(name = "AK_USER", columnNames = "LOGIN"))
-@NamedEntityGraph(name = "userWithUserRightsAndDetails",
-        attributeNodes = @NamedAttributeNode(value = "userRights", subgraph = "userRightsAndDetails"),
-        subgraphs = @NamedSubgraph(name = "userRightsAndDetails", attributeNodes = @NamedAttributeNode("details")))
 public class UserEntity implements IEntity, Serializable {
 
     @Id
@@ -25,7 +24,7 @@ public class UserEntity implements IEntity, Serializable {
     @Column(name = "ID")
     private long id;
 
-    @Column(name = "LOGIN")
+    @Column(name = "LOGIN", nullable = false)
     private String login;
 
     @Column(name = "PASSWORD", nullable = false, length = 128)

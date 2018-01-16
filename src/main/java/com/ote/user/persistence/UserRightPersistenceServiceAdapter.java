@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,8 +54,8 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
     public List<Perimeter> getPerimeters(String user, String application) {
 
         // Retrieve user's rights for the given application
-        UserRightEntity userRightEntity = userRightJpaRepository.getByUserLoginAndApplicationCode(user, application);
-        Set<IRightDetail> rightDetails = new HashSet<>(userRightEntity.getDetails());
+        UserRightEntity userRightEntity = userRightJpaRepository.findByUserLoginAndApplicationCodeWithDetails(user, application);
+        List<IRightDetail> rightDetails = new ArrayList<>(userRightEntity.getDetails());
 
         // Retrieve user's rights inherited from its securityGroups for the given application
         UserEntity userEntity = userJpaRepository.findByLogin(user);
@@ -66,27 +69,35 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
 
         private Map<String, Perimeter> perimeters = new HashMap<>();
 
-        public PerimeterAggregator(Set<IRightDetail> details) {
+        public PerimeterAggregator(List<IRightDetail> details) {
             // Split Perimeter by code
             details.stream().
-                    map(detailEntity -> detailEntity.getPerimeter().getCode()).
+                    map(IRightDetail::getPerimeter).
+                    distinct().
+                    map(PerimeterEntity::getCode).
                     forEach(code -> {
                         if (!perimeters.containsKey(code)) {
                             perimeters.put(code, new Perimeter(code));
                         }
                     });
-
             details.stream().
-                    // Add privileges foreach
+                    forEach(detailEntity -> {
+                        String code = detailEntity.getPerimeter().getCode();
+                        Perimeter perimeter = perimeters.get(code);
+                        perimeter.getPrivileges().addAll(detailEntity.getPrivileges().stream().
+                                map(PrivilegeEntity::getCode).
+                                collect(Collectors.toList()));
+                    });
+
+            /*details.stream().
                     peek(detailEntity -> {
                         String code = detailEntity.getPerimeter().getCode();
                         Perimeter perimeter = perimeters.get(code);
                         perimeter.getPrivileges().addAll(detailEntity.getPrivileges().stream().
                                 map(PrivilegeEntity::getCode).
                                 collect(Collectors.toList()));
-                    }).
-                    // Set parent if any (need map already built)
-                    filter(detailEntity -> Optional.ofNullable(detailEntity.getPerimeter().getParent()).isPresent()).
+                    }).// Add privileges foreach
+                    filter(detailEntity -> Optional.ofNullable(detailEntity.getPerimeter().getParent()).isPresent()).// Set parent if any (need map already built)
                     filter(detailEntity -> perimeters.containsKey(detailEntity.getPerimeter().getParent().getCode())).
                     forEach(detailEntity -> {
                         String code = detailEntity.getPerimeter().getCode();
@@ -94,13 +105,17 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
                         Perimeter perimeter = perimeters.get(code);
                         Perimeter parentPerimeter = perimeters.get(parent);
                         parentPerimeter.getPerimeters().add(perimeter);
-                    });
+                    });*/
         }
 
         public List<Perimeter> getPerimeters() {
-            return new ArrayList<>(perimeters.values());
+            return perimeters.values().stream().filter(distinctByKey(p -> p.getCode())).collect(Collectors.toList());
+        }
+
+        private <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
+            Map<Object, Boolean> map = new ConcurrentHashMap<>();
+            return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
         }
     }
-
 
 }

@@ -1,5 +1,6 @@
 package com.ote.common.persistence.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,8 +13,8 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(of = {"user", "application"})
+@EqualsAndHashCode(of = {"user", "application"})
 @Table(name = "T_USER_RIGHT", uniqueConstraints = @UniqueConstraint(name = "AK_USER_RIGHT", columnNames = {"USER_ID", "APPLICATION_ID"}))
-@NamedEntityGraph(name = "userRightWithDetails", attributeNodes = @NamedAttributeNode(value = "details"))
 public class UserRightEntity implements Serializable {
 
     @Id
@@ -22,11 +23,11 @@ public class UserRightEntity implements Serializable {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "USER_ID", nullable = false)
     private UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "APPLICATION_ID")
+    @JoinColumn(name = "APPLICATION_ID", nullable = false)
     private ApplicationEntity application;
 
     @OneToMany(mappedBy = "userRight")

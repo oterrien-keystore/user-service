@@ -6,6 +6,7 @@ import com.ote.user.credentials.api.IEncryptorService;
 import com.ote.user.credentials.api.exception.EncryptingException;
 import com.ote.user.persistence.UserRightPersistenceServiceAdapter;
 import com.ote.user.rights.api.PerimeterPath;
+import com.ote.user.service.UserRightServiceAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,9 @@ public class UserRightDataInitializerMock {
     @Autowired
     private UserRightPersistenceServiceAdapter userRightPersistenceServiceAdapter;
 
+    @Autowired
+    private UserRightServiceAdapter userRightServiceAdapter;
+
     public UserRightDataInitializerMock() {
         log.warn("###### MOCK ##### " + this.getClass().getSimpleName());
     }
@@ -100,8 +104,6 @@ public class UserRightDataInitializerMock {
                 new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL/GLE", "WRITE"),
                 new UserRight("maryline.terrien", "TEST_SERVICE", "DEAL/GLE", "READ")
         );
-
-        log.info("###### MOCK ##### " + userRightPersistenceServiceAdapter.getPerimeters("olivier.terrien", applicationName).toString());
     }
 
     private void createUsers(User... users) {

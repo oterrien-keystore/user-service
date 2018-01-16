@@ -20,14 +20,20 @@ public class UserRightServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-            "user1, TEST_SERVICE, PARENT, READ, TRUE",
-            "user1, TEST_SERVICE, PARENT, WRITE, FALSE",
-            "user1, TEST_SERVICE, PARENT/CHILD, READ, TRUE",
-            "user1, TEST_SERVICE, PARENT/CHILD, WRITE, TRUE"})
-    public void checkUserPrivilege(String user, String application, String perimeter, String privilege, boolean expectation) {
+            "user1, TEST_SERVICE, PARENT, READ, TRUE, user1 should own READ on PARENT",
+            "user1, TEST_SERVICE, PARENT, WRITE, FALSE, user should not own WRITE on PARENT",
+            "user1, TEST_SERVICE, PARENT/CHILD, READ, TRUE, user1 should own READ on PARENT/CHILD (inherited from PARENT)",
+            "user1, TEST_SERVICE, PARENT/CHILD, WRITE, TRUE, user1 should own WRITE on PARENT/CHILD",
+            "user1, TEST_SERVICE, PARENT, ADMIN, TRUE, user1 should own ADMIN on PARENT",
+            "user1, TEST_SERVICE, PARENT/CHILD, ADMIN, TRUE, user1 should own ADMIN on PARENT/CHILD (inherited from PARENT)",
+            "user2, TEST_SERVICE, PARENT, WRITE, FALSE, user2 should not own WRITE on PARENT",
+            "user2, TEST_SERVICE, PARENT/CHILD, READ, TRUE, user2 should own READ on PARENT",
+            "user2, TEST_SERVICE, PARENT, READ, TRUE, user2 should own READ on PARENT from SecurityGroup",
+            "user3, TEST_SERVICE, PARENT/CHILD, READ, TRUE, user3 should own READ on PARENT/CHILD"})
+    public void checkUserRightPrivilege(String user, String application, String perimeter, String privilege, boolean expectation, String description) {
 
         // Check with path Deal
         boolean hasPrivilege = userRightRestControllerMock.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeter, privilege);
-        Assertions.assertThat(hasPrivilege).as("check READ for PARENT").isEqualTo(expectation);
+        Assertions.assertThat(hasPrivilege).as(description).isEqualTo(expectation);
     }
 }

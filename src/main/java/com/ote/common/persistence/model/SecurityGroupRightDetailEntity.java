@@ -1,5 +1,6 @@
 package com.ote.common.persistence.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,7 +22,7 @@ public class SecurityGroupRightDetailEntity implements Serializable, IRightDetai
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "SECURITY_GROUP_RIGHT_ID")
+    @JoinColumn(name = "SECURITY_GROUP_RIGHT_ID", nullable = false)
     private SecurityGroupRightEntity securityGroupRight;
 
     @OneToOne
@@ -32,14 +33,4 @@ public class SecurityGroupRightDetailEntity implements Serializable, IRightDetai
             joinColumns = @JoinColumn(name = "SECURITY_GROUP_RIGHT_PERIMETER_ID", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "PRIVILEGE_ID", referencedColumnName = "ID"))
     private Set<PrivilegeEntity> privileges;
-
-    @Override
-    public int hashCode() {
-        return this.getPerimeter().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof IRightDetail && this.getPerimeter().equals(((IRightDetail) obj).getPerimeter());
-    }
 }

@@ -21,10 +21,10 @@ public class UserRightDetailEntity implements Serializable, IRightDetail {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "USER_RIGHT_ID")
+    @JoinColumn(name = "USER_RIGHT_ID", nullable = false)
     private UserRightEntity userRight;
 
-    @OneToOne
+    @ManyToOne(optional = false)
     private PerimeterEntity perimeter;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -32,14 +32,4 @@ public class UserRightDetailEntity implements Serializable, IRightDetail {
             joinColumns = @JoinColumn(name = "USER_RIGHT_PERIMETER_ID", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "PRIVILEGE_ID", referencedColumnName = "ID"))
     private Set<PrivilegeEntity> privileges;
-
-    @Override
-    public int hashCode() {
-        return this.getPerimeter().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof IRightDetail && this.getPerimeter().equals(((IRightDetail) obj).getPerimeter());
-    }
 }

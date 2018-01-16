@@ -2,6 +2,7 @@ package com.ote.common.persistence.model;
 
 import com.ote.common.controller.PrivilegePayload;
 import com.ote.crud.model.IEntity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString(of = "code")
+@EqualsAndHashCode(of = "code")
 @Table(name = "T_PRIVILEGE", uniqueConstraints = @UniqueConstraint(name = "AK_PRIVILEGE", columnNames = "CODE"))
 public class PrivilegeEntity implements IEntity, Serializable {
 
@@ -21,7 +23,7 @@ public class PrivilegeEntity implements IEntity, Serializable {
     @Column(name = "ID")
     private long id;
 
-    @Column(name = "CODE")
+    @Column(name = "CODE", nullable = false)
     private String code;
 
     @Override

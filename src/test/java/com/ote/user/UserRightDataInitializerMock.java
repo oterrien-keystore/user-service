@@ -44,6 +44,15 @@ public class UserRightDataInitializerMock {
     @Autowired
     private IUserRightDetailJpaRepository userRightDetailRepository;
 
+    @Autowired
+    private ISecurityGroupJpaRepository securityGroupRepository;
+
+    @Autowired
+    private ISecurityGroupRightJpaRepository securityGroupRightRepository;
+
+    @Autowired
+    private ISecurityGroupRightDetailJpaRepository securityGroupRightDetailRepository;
+
     public UserRightDataInitializerMock() {
         log.warn("###### MOCK ##### " + this.getClass().getSimpleName());
     }
@@ -52,7 +61,10 @@ public class UserRightDataInitializerMock {
     public void init() throws Exception {
 
         // Create Users
-        createUsers(new User("user1", "password"), new User("user2", "password"));
+        createUsers(
+                new User("user1", "password"),
+                new User("user2", "password"),
+                new User("user3", "password"));
 
         // Create Applications
         createApplications("TEST_SERVICE");
@@ -61,14 +73,87 @@ public class UserRightDataInitializerMock {
         createPerimeters("PARENT", "PARENT/CHILD");
 
         // Create Privileges
-        createPrivileges("READ", "WRITE");
+        createPrivileges("READ", "WRITE", "ADMIN");
 
         //Create UserRights
         createUserRights(
                 new UserRight("user1", "TEST_SERVICE", "PARENT", "READ"),
                 new UserRight("user1", "TEST_SERVICE", "PARENT/CHILD", "WRITE"),
-                new UserRight("user2", "TEST_SERVICE", "PARENT/CHILD", "READ")
+                new UserRight("user2", "TEST_SERVICE", "PARENT/CHILD", "READ"),
+                new UserRight("user3", "TEST_SERVICE", "PARENT/CHILD", "READ")
         );
+
+        // Create Security Group
+        createSecurityGroup(new SecurityGroup("TEST_SERVICE_ADMINS", "user1"));
+        createSecurityGroup(new SecurityGroup("TEST_SERVICE_READERS", "user2"));
+
+        // Create Security Group Rights
+        createSecurityGroupRight(new SecurityGroupRight("TEST_SERVICE_ADMINS", "TEST_SERVICE", "PARENT", "ADMIN"));
+        createSecurityGroupRight(new SecurityGroupRight("TEST_SERVICE_ADMINS", "TEST_SERVICE", "PARENT/CHILD", "WRITE"));
+        createSecurityGroupRight(new SecurityGroupRight("TEST_SERVICE_READERS", "TEST_SERVICE", "PARENT", "READ"));
+
+
+    }
+
+    private void createSecurityGroup(SecurityGroup... securityGroups) {
+        Arrays.asList(securityGroups).
+                forEach(p -> {
+                    SecurityGroupEntity securityGroupEntity = new SecurityGroupEntity();
+                    securityGroupEntity.setCode(p.code);
+                    securityGroupEntity.setUsers(p.users.stream().map(u -> userRepository.findByLogin(u)).collect(Collectors.toSet()));
+                    if (!securityGroupRepository.existsByCode(p.code)) {
+                        securityGroupRepository.save(securityGroupEntity);
+                        securityGroupRepository.flush();
+                    }
+                });
+    }
+
+    private void createSecurityGroupRight(SecurityGroupRight... securityGroupRights) {
+        Arrays.asList(securityGroupRights).
+                forEach(p -> {
+                    SecurityGroupEntity securityGroup = securityGroupRepository.findByCode(p.code);
+                    SecurityGroupRightEntity securityGroupRightEntity = new SecurityGroupRightEntity();
+                    securityGroupRightEntity.setSecurityGroup(securityGroup);
+                    securityGroupRightEntity.setApplication(applicationRepository.findByCode(p.application));
+                    if (!securityGroupRightRepository.existsBySecurityGroupCodeAndApplicationCode(p.code, p.application)) {
+                        securityGroupRightRepository.save(securityGroupRightEntity);
+                        securityGroupRightRepository.flush();
+                    }
+                    PerimeterPath perimeterPath = new PerimeterPath.Parser(p.perimeter).get();
+                    String perimeter = perimeterPath.getPath()[perimeterPath.getPath().length - 1];
+                    Set<PrivilegeEntity> privilegeEntities = p.privileges.stream().map(pp -> privilegeRepository.findByCode(pp)).collect(Collectors.toSet());
+
+                    SecurityGroupRightDetailEntity detail = new SecurityGroupRightDetailEntity();
+                    detail.setSecurityGroupRight(securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCode(p.code, p.application));
+                    detail.setPerimeter(perimeterRepository.findByCode(perimeter));
+                    detail.setPrivileges(privilegeEntities);
+                    securityGroupRightDetailRepository.save(detail);
+                    securityGroupRightDetailRepository.flush();
+                });
+    }
+
+    private class SecurityGroup {
+        private final String code;
+        private final List<String> users;
+
+        public SecurityGroup(String code, String... users) {
+            this.code = code;
+            this.users = Arrays.asList(users);
+        }
+    }
+
+    private class SecurityGroupRight {
+        private final String code;
+        private final String application;
+        private final String perimeter;
+        private final List<String> privileges;
+
+        public SecurityGroupRight(String code, String application, String perimeter, String... privileges) {
+            this.code = code;
+            this.application = application;
+            this.perimeter = perimeter;
+            this.privileges = Arrays.asList(privileges);
+        }
     }
 
     private void createUsers(User... users) {

@@ -23,4 +23,12 @@ public interface ISecurityGroupRightJpaRepository extends IEntityRepository<Secu
             "and :user member of sgr.securityGroup.users")
     List<SecurityGroupRightEntity> findByUserAndApplicationCode(@Param("user") UserEntity user,
                                                                 @Param("application") String application);
+
+    /*@Query("select sgr from SecurityGroupRightEntity sgr " +
+            "join fetch sgr.details " +
+            "inner join sgr.securityGroup.users" +
+            "where sgr.application.code = :application " +
+            "and :user member of sgr.securityGroup.users")
+    List<SecurityGroupRightEntity> findByUserLoginAndApplicationCode(@Param("user") String user,
+                                                                @Param("application") String application);*/
 }
