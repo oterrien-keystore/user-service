@@ -3,7 +3,6 @@ package com.ote.common.persistence.repository;
 import com.ote.common.persistence.model.SecurityGroupRightEntity;
 import com.ote.common.persistence.model.UserEntity;
 import com.ote.crud.IEntityRepository;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,18 +16,35 @@ public interface ISecurityGroupRightJpaRepository extends IEntityRepository<Secu
 
     SecurityGroupRightEntity findBySecurityGroupCodeAndApplicationCode(String securityGroup, String application);
 
+    @Query("select case when count(sgr) > 0 then true else false end " +
+            "from SecurityGroupRightEntity sgr " +
+            "where sgr.application.code = :application " +
+            "and :user member of sgr.securityGroup.users")
+    boolean existsByUserAndApplicationCode(@Param("user") UserEntity user,
+                                           @Param("application") String application);
+
     @Query("select sgr from SecurityGroupRightEntity sgr " +
-            "join fetch sgr.details " +
+            "left join fetch sgr.details " +
             "where sgr.application.code = :application " +
             "and :user member of sgr.securityGroup.users")
     List<SecurityGroupRightEntity> findByUserAndApplicationCode(@Param("user") UserEntity user,
                                                                 @Param("application") String application);
 
-    /*@Query("select sgr from SecurityGroupRightEntity sgr " +
-            "join fetch sgr.details " +
-            "inner join sgr.securityGroup.users" +
+    @Query("select case when count(sgr) > 0 then true else false end " +
+            "from SecurityGroupRightEntity sgr " +
+            "inner join sgr.securityGroup sg " +
+            "inner join sg.users u " +
             "where sgr.application.code = :application " +
-            "and :user member of sgr.securityGroup.users")
+            "and u.login = :user")
+    boolean existsByUserLoginAndApplicationCode(@Param("user") String user,
+                                                                     @Param("application") String application);
+
+    @Query("select distinct sgr from SecurityGroupRightEntity sgr " +
+            "left join fetch sgr.details " +
+            "inner join fetch sgr.securityGroup sg " +
+            "inner join sg.users u " +
+            "where sgr.application.code = :application " +
+            "and u.login = :user")
     List<SecurityGroupRightEntity> findByUserLoginAndApplicationCode(@Param("user") String user,
-                                                                @Param("application") String application);*/
+                                                                     @Param("application") String application);
 }

@@ -1,5 +1,6 @@
 package com.ote.common.controller;
 
+import com.ote.common.Scope;
 import com.ote.crud.DefaultPersistenceRestController;
 import com.ote.crud.IPersistenceRestController;
 import com.ote.crud.IPersistenceService;
@@ -29,14 +30,12 @@ public class PerimeterPersistenceRestController {
     @Autowired
     private IPersistenceService<PerimeterPayload> persistenceService;
 
-    private final String entityName = "PERIMETER";
-
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
     private IPersistenceRestController<PerimeterPayload> defaultController;
 
     @PostConstruct
     public void init(){
-        defaultController = new DefaultPersistenceRestController<>(persistenceService, entityName);
+        defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Perimeter.name());
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

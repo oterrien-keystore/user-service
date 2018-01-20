@@ -12,11 +12,11 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-    initialize: true
+    initialize: false
     continue-on-error: true
     platform: h2
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate.dialect: org.hibernate.dialect.H2Dialect
     hibernate:

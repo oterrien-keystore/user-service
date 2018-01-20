@@ -19,6 +19,8 @@ import java.util.Set;
 @Table(name = "T_USER", uniqueConstraints = @UniqueConstraint(name = "AK_USER", columnNames = "LOGIN"))
 public class UserEntity implements IEntity, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -39,9 +41,9 @@ public class UserEntity implements IEntity, Serializable {
     @Override
     public UserPayload convert() {
         UserPayload payload = new UserPayload();
-        payload.setId(id);
-        payload.setLogin(login);
-        payload.setPassword(password);
+        payload.setId(getId());
+        payload.setLogin(getLogin());
+        payload.setPassword(getPassword());
         return payload;
     }
 }

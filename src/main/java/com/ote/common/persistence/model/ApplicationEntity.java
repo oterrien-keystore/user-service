@@ -19,6 +19,8 @@ import java.util.Set;
 @Table(name = "T_APPLICATION", uniqueConstraints = @UniqueConstraint(name = "AK_APPLICATION", columnNames = "CODE"))
 public class ApplicationEntity implements IEntity, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")

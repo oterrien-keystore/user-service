@@ -1,10 +1,11 @@
 package com.ote.common.security;
 
 import com.ote.user.rights.api.IUserRightService;
-import com.ote.user.rights.api.PerimeterPath;
+import com.ote.user.rights.api.Path;
 import com.ote.user.rights.api.exception.ApplicationNotFoundException;
 import com.ote.user.rights.api.exception.RoleNotFoundException;
 import com.ote.user.rights.api.exception.UserNotFoundException;
+import com.ote.user.rights.api.exception.UserRightServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.PermissionEvaluator;
@@ -32,10 +33,9 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
     private boolean hasPrivilege(Authentication auth, String perimeter, String permission) {
         try {
-            PerimeterPath perimeterPath = new PerimeterPath.Parser(perimeter).get();
-            return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(auth.getName(), applicationName, perimeterPath, permission);
-        } catch (UserNotFoundException | ApplicationNotFoundException | RoleNotFoundException e) {
-            log.debug(e.getMessage(), e);
+            return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(auth.getName(), applicationName, perimeter, permission);
+        } catch (UserRightServiceException e) {
+            log.info(e.getMessage(), e);
             return false;
         }
     }

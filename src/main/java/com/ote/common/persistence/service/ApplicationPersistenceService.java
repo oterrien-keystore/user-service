@@ -1,5 +1,6 @@
 package com.ote.common.persistence.service;
 
+import com.ote.common.Scope;
 import com.ote.common.controller.ApplicationPayload;
 import com.ote.common.persistence.model.ApplicationEntity;
 import com.ote.crud.IEntityRepository;
@@ -17,7 +18,7 @@ public class ApplicationPersistenceService implements IPersistenceService<Applic
     private IEntityRepository<ApplicationEntity> entityRepository;
 
     @Getter
-    private String entityName = "APPLICATION";
+    private String scope = Scope.Application.name();
 
     @Value("${page.default.size}")
     @Getter

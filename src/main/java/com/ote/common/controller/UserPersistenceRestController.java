@@ -1,5 +1,6 @@
 package com.ote.common.controller;
 
+import com.ote.common.Scope;
 import com.ote.crud.DefaultPersistenceRestController;
 import com.ote.crud.IPersistenceRestController;
 import com.ote.crud.IPersistenceService;
@@ -30,14 +31,12 @@ public class UserPersistenceRestController {
     @Autowired
     private IPersistenceService<UserPayload> persistenceService;
 
-    private final String entityName = "USER";
-
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
     private IPersistenceRestController<UserPayload> defaultController;
 
     @PostConstruct
     public void init() {
-        defaultController = new DefaultPersistenceRestController<>(persistenceService, entityName);
+        defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.User.name());
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

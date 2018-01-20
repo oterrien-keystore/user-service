@@ -13,8 +13,10 @@ public interface IUserRightJpaRepository extends JpaRepository<UserRightEntity, 
 
     UserRightEntity findByUserLoginAndApplicationCode(String user, String application);
 
-    @Query("select u from UserRightEntity u join fetch u.details " +
+    @Query("select u from UserRightEntity u " +
+            "left join fetch u.details " +
             "where u.user.login = :user " +
             "and u.application.code = :application")
-    UserRightEntity findByUserLoginAndApplicationCodeWithDetails(@Param("user") String user, @Param("application") String application);
+    UserRightEntity findByUserLoginAndApplicationCodeWithDetails(@Param("user") String user,
+                                                                 @Param("application") String application);
 }

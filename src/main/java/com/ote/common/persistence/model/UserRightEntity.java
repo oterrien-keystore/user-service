@@ -17,6 +17,8 @@ import java.util.Set;
 @Table(name = "T_USER_RIGHT", uniqueConstraints = @UniqueConstraint(name = "AK_USER_RIGHT", columnNames = {"USER_ID", "APPLICATION_ID"}))
 public class UserRightEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")

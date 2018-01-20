@@ -16,8 +16,10 @@ import java.util.Set;
 @Setter
 @ToString(of = {"code"})
 @EqualsAndHashCode(of = "code")
-@Table(name = "T_PERIMETER", uniqueConstraints = @UniqueConstraint(name = "AK_PERIMETER", columnNames = "CODE"))
-public class PerimeterEntity implements IEntity, Serializable, Comparable<PerimeterEntity> {
+@Table(name = "T_PERIMETER", uniqueConstraints = @UniqueConstraint(name = "AK_PERIMETER", columnNames = {"CODE", "PARENT_ID"}))
+public class PerimeterEntity implements IEntity, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,8 +44,11 @@ public class PerimeterEntity implements IEntity, Serializable, Comparable<Perime
         return payload;
     }
 
-    @Override
-    public int compareTo(PerimeterEntity o) {
-        return this.code.compareToIgnoreCase(o.getCode());
+    public String getCode() {
+        if (parent != null) {
+            return parent.getCode() + "/" + code;
+        } else {
+            return code;
+        }
     }
 }

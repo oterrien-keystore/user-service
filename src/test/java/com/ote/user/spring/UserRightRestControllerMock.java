@@ -1,4 +1,4 @@
-package com.ote.user;
+package com.ote.user.spring;
 
 import com.ote.common.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +19,6 @@ public class UserRightRestControllerMock {
 
     @Autowired
     private WebConfigurationMock webConfiguration;
-
-    public UserRightRestControllerMock() {
-        log.warn("###### MOCK ##### " + this.getClass().getSimpleName());
-    }
 
     public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, String perimeter, String privilege) {
         try {

@@ -1,5 +1,6 @@
 package com.ote.common.persistence.service;
 
+import com.ote.common.Scope;
 import com.ote.common.controller.PerimeterPayload;
 import com.ote.common.persistence.model.PerimeterEntity;
 import com.ote.crud.IEntityRepository;
@@ -17,7 +18,7 @@ public class PerimeterPersistenceService implements IPersistenceService<Perimete
     private IEntityRepository<PerimeterEntity> entityRepository;
 
     @Getter
-    private String entityName = "PERIMETER";
+    private String scope = Scope.Perimeter.name();
 
     @Value("${page.default.size}")
     @Getter

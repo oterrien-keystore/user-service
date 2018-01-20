@@ -1,8 +1,12 @@
 package com.ote.user.persistence;
 
-import com.ote.common.persistence.model.*;
+import com.ote.common.persistence.model.IRightDetail;
+import com.ote.common.persistence.model.PrivilegeEntity;
+import com.ote.common.persistence.model.SecurityGroupRightEntity;
 import com.ote.common.persistence.repository.*;
+import com.ote.user.rights.api.Path;
 import com.ote.user.rights.api.Perimeter;
+import com.ote.user.rights.api.Privilege;
 import com.ote.user.rights.spi.IUserRightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,17 +15,22 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 @Service
 public class UserRightPersistenceServiceAdapter implements IUserRightRepository {
-
 
     @Autowired
     private IUserJpaRepository userJpaRepository;
 
     @Autowired
     private IApplicationJpaRepository applicationJpaRepository;
+
+    @Autowired
+    private IPerimeterJpaRepository perimeterJpaRepository;
+
+    @Autowired
+    private IPrivilegeJpaRepository privilegeJpaRepository;
 
     @Autowired
     private IUserRightJpaRepository userRightJpaRepository;
@@ -47,69 +56,53 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
 
     @Override
     public boolean isRoleDefined(String user, String application) {
-        return userRightJpaRepository.existsByUserLoginAndApplicationCode(user, application);
+        return userRightJpaRepository.existsByUserLoginAndApplicationCode(user, application) ||
+                securityGroupRightRepository.existsByUserLoginAndApplicationCode(user, application);
     }
 
     @Override
     public List<Perimeter> getPerimeters(String user, String application) {
 
+        List<IRightDetail> rightDetails = new ArrayList<>();
+
         // Retrieve user's rights for the given application
-        UserRightEntity userRightEntity = userRightJpaRepository.findByUserLoginAndApplicationCodeWithDetails(user, application);
-        List<IRightDetail> rightDetails = new ArrayList<>(userRightEntity.getDetails());
+        Optional.ofNullable(userRightJpaRepository.findByUserLoginAndApplicationCodeWithDetails(user, application)).
+                ifPresent(p -> rightDetails.addAll(p.getDetails()));
 
         // Retrieve user's rights inherited from its securityGroups for the given application
-        UserEntity userEntity = userJpaRepository.findByLogin(user);
-        List<SecurityGroupRightEntity> securityGroupRights = securityGroupRightRepository.findByUserAndApplicationCode(userEntity, application);
-        rightDetails.addAll(securityGroupRights.stream().map(SecurityGroupRightEntity::getDetails).flatMap(Collection::stream).collect(Collectors.toSet()));
+        //UserEntity userEntity = userJpaRepository.findByLogin(user);
+        List<SecurityGroupRightEntity> securityGroupRights = securityGroupRightRepository.findByUserLoginAndApplicationCode(user, application);
+        securityGroupRights.stream().
+                map(SecurityGroupRightEntity::getDetails).
+                forEach(p -> rightDetails.addAll(p));
 
-        return new PerimeterAggregator(rightDetails).getPerimeters();
+        return new PerimeterAggregator(rightDetails).get();
     }
 
-    private class PerimeterAggregator {
+    private class PerimeterAggregator implements Supplier<List<Perimeter>> {
 
         private Map<String, Perimeter> perimeters = new HashMap<>();
 
-        public PerimeterAggregator(List<IRightDetail> details) {
-            // Split Perimeter by code
-            details.stream().
-                    map(IRightDetail::getPerimeter).
-                    distinct().
-                    map(PerimeterEntity::getCode).
-                    forEach(code -> {
-                        if (!perimeters.containsKey(code)) {
-                            perimeters.put(code, new Perimeter(code));
-                        }
-                    });
-            details.stream().
-                    forEach(detailEntity -> {
-                        String code = detailEntity.getPerimeter().getCode();
-                        Perimeter perimeter = perimeters.get(code);
-                        perimeter.getPrivileges().addAll(detailEntity.getPrivileges().stream().
-                                map(PrivilegeEntity::getCode).
-                                collect(Collectors.toList()));
-                    });
+        PerimeterAggregator(List<IRightDetail> details) {
 
-            /*details.stream().
-                    peek(detailEntity -> {
-                        String code = detailEntity.getPerimeter().getCode();
-                        Perimeter perimeter = perimeters.get(code);
-                        perimeter.getPrivileges().addAll(detailEntity.getPrivileges().stream().
-                                map(PrivilegeEntity::getCode).
-                                collect(Collectors.toList()));
-                    }).// Add privileges foreach
-                    filter(detailEntity -> Optional.ofNullable(detailEntity.getPerimeter().getParent()).isPresent()).// Set parent if any (need map already built)
-                    filter(detailEntity -> perimeters.containsKey(detailEntity.getPerimeter().getParent().getCode())).
-                    forEach(detailEntity -> {
-                        String code = detailEntity.getPerimeter().getCode();
-                        String parent = detailEntity.getPerimeter().getParent().getCode();
-                        Perimeter perimeter = perimeters.get(code);
-                        Perimeter parentPerimeter = perimeters.get(parent);
-                        parentPerimeter.getPerimeters().add(perimeter);
-                    });*/
+            details.forEach(p -> {
+                String code = p.getPerimeter().getCode();
+                Perimeter perimeter =
+                        Optional.ofNullable(perimeters.get(code)).
+                                orElseGet(() -> {
+                                    Perimeter p1 = new Perimeter(code);
+                                    perimeters.put(code, p1);
+                                    return p1;
+                                });
+                p.getPrivileges().
+                        stream().
+                        map(PrivilegeEntity::getCode).
+                        forEach(pr -> perimeter.getPrivileges().add(pr));
+            });
         }
 
-        public List<Perimeter> getPerimeters() {
-            return perimeters.values().stream().filter(distinctByKey(p -> p.getCode())).collect(Collectors.toList());
+        public List<Perimeter> get() {
+            return new ArrayList<>(perimeters.values());
         }
 
         private <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
@@ -118,4 +111,28 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
         }
     }
 
+    @Override
+    public boolean isPerimeterDefined(Path perimeterPath) {
+        return perimeterJpaRepository.existsByPath(perimeterPath);
+    }
+
+    @Override
+    public boolean isPrivilegeDefined(String privilege) {
+        return privilegeJpaRepository.existsByCode(privilege);
+    }
+
+    @Override
+    public Privilege getPrivilegeHierarchy(String privilege) {
+        return Optional.ofNullable(privilegeJpaRepository.findByCode(privilege)).
+                map(this::convert).
+                orElse(null);
+    }
+
+    private Privilege convert(PrivilegeEntity entity) {
+        if (entity.getParent() != null) {
+            return new Privilege(entity.getCode(), convert(entity.getParent()));
+        } else {
+            return new Privilege(entity.getCode());
+        }
+    }
 }

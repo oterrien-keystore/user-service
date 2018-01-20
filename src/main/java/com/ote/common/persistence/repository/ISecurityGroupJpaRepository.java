@@ -13,6 +13,9 @@ public interface ISecurityGroupJpaRepository extends IEntityRepository<SecurityG
 
     SecurityGroupEntity findByCode(String code);
 
-    @Query("select s from SecurityGroupEntity s join fetch s.securityGroupRights where s.code = :code")
+    @Query("select s from SecurityGroupEntity s " +
+            "left join fetch s.securityGroupRights sgr " +
+            "left join fetch sgr.details sgrd " +
+            "where s.code = :code")
     SecurityGroupEntity getByCode(@Param("code") String code);
 }

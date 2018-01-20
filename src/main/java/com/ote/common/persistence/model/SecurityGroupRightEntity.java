@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
@@ -16,7 +17,9 @@ import java.util.Set;
 @ToString(of = {"securityGroup", "application"})
 @EqualsAndHashCode(of = {"securityGroup", "application"})
 @Table(name = "T_SECURITY_GROUP_RIGHT", uniqueConstraints = @UniqueConstraint(name = "AK_SECURITY_GROUP_RIGHT", columnNames = {"SECURITY_GROUP_ID", "APPLICATION_ID"}))
-public class SecurityGroupRightEntity implements IEntity {
+public class SecurityGroupRightEntity implements IEntity,Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

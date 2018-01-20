@@ -1,5 +1,6 @@
 package com.ote.common.persistence.service;
 
+import com.ote.common.Scope;
 import com.ote.common.controller.UserPayload;
 import com.ote.common.persistence.model.UserEntity;
 import com.ote.crud.IEntityRepository;
@@ -27,7 +28,7 @@ public class UserPersistenceService implements IPersistenceService<UserPayload> 
     private IEncryptorService encryptorService;
 
     @Getter
-    private String entityName = "USER";
+    private String scope = Scope.User.name();
 
     @Value("${page.default.size}")
     @Getter
@@ -39,7 +40,7 @@ public class UserPersistenceService implements IPersistenceService<UserPayload> 
             payload.setPassword(encryptorService.encrypt(payload.getPassword()));
             return IPersistenceService.super.create(payload);
         } catch (EncryptingException e) {
-            throw new CreateException(entityName, e);
+            throw new CreateException(scope, e.getMessage(), e);
         }
     }
 
@@ -49,7 +50,7 @@ public class UserPersistenceService implements IPersistenceService<UserPayload> 
             payload.setPassword(encryptorService.encrypt(payload.getPassword()));
             return IPersistenceService.super.reset(id, payload);
         } catch (EncryptingException e) {
-            throw new ResetException(entityName, id, e);
+            throw new ResetException(scope, id, e.getMessage(), e);
         }
     }
 
@@ -59,7 +60,7 @@ public class UserPersistenceService implements IPersistenceService<UserPayload> 
             payload.setPassword(encryptorService.encrypt(payload.getPassword()));
             return IPersistenceService.super.merge(id, payload);
         } catch (EncryptingException e) {
-            throw new MergeException(entityName, id, e);
+            throw new MergeException(scope, id, e.getMessage(), e);
         }
     }
 }

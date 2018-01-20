@@ -14,11 +14,11 @@ public interface IUserJpaRepository extends IEntityRepository<UserEntity> {
     UserEntity findByLogin(String login);
 
     @Query("select u from UserEntity u " +
-            "join fetch u.userRights ur " +
-            "join fetch ur.details urd " +
-            "join fetch u.securityGroups sg " +
-            "join fetch sg.securityGroupRights sgr " +
-            "join fetch sgr.details sgrd " +
+            "left join fetch u.userRights ur " +
+            "left join fetch ur.details urd " +
+            "left join fetch u.securityGroups sg " +
+            "left join fetch sg.securityGroupRights sgr " +
+            "left join fetch sgr.details sgrd " +
             "where u.login = :login")
     UserEntity findByLoginWithUserRightsAndSecurityGroupRights(@Param("login") String login);
 }

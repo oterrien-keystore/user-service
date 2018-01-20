@@ -1,4 +1,4 @@
-package com.ote.user;
+package com.ote.user.spring;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,13 +1,14 @@
 package com.ote.common.persistence.model;
 
+import com.ote.common.controller.SecurityGroupPayload;
 import com.ote.crud.model.IEntity;
-import com.ote.crud.model.IPayload;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
@@ -16,7 +17,9 @@ import java.util.Set;
 @ToString(of = "code")
 @EqualsAndHashCode(of = "code")
 @Table(name = "T_SECURITY_GROUP", uniqueConstraints = @UniqueConstraint(name = "AK_SECURITY_GROUP", columnNames = "CODE"))
-public class SecurityGroupEntity implements IEntity {
+public class SecurityGroupEntity implements IEntity, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +39,10 @@ public class SecurityGroupEntity implements IEntity {
     private Set<SecurityGroupRightEntity> securityGroupRights;
 
     @Override
-    public <TP extends IPayload> TP convert() {
-        return null;
+    public SecurityGroupPayload convert() {
+        SecurityGroupPayload payload = new SecurityGroupPayload();
+        payload.setId(getId());
+        payload.setCode(getCode());
+        return payload;
     }
 }
