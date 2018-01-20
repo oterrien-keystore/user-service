@@ -1,10 +1,6 @@
 package com.ote.common.security;
 
 import com.ote.user.rights.api.IUserRightService;
-import com.ote.user.rights.api.Path;
-import com.ote.user.rights.api.exception.ApplicationNotFoundException;
-import com.ote.user.rights.api.exception.RoleNotFoundException;
-import com.ote.user.rights.api.exception.UserNotFoundException;
 import com.ote.user.rights.api.exception.UserRightServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

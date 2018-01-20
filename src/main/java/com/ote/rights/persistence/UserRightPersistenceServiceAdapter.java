@@ -1,4 +1,4 @@
-package com.ote.user.persistence;
+package com.ote.rights.persistence;
 
 import com.ote.common.persistence.model.IRightDetail;
 import com.ote.common.persistence.model.PrivilegeEntity;

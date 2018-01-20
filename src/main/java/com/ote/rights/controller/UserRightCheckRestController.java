@@ -1,4 +1,4 @@
-package com.ote.user.controller;
+package com.ote.rights.controller;
 
 import com.ote.user.rights.api.IUserRightService;
 import lombok.extern.slf4j.Slf4j;

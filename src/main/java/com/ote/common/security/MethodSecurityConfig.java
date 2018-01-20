@@ -1,7 +1,6 @@
 package com.ote.common.security;
 
 import com.ote.user.rights.api.IUserRightService;
-import com.ote.user.service.UserRightServiceAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.ote.user.service;
+package com.ote.rights.service;
 
 import com.ote.user.rights.api.IUserRightService;
 import com.ote.user.rights.api.UserRightServiceProvider;
