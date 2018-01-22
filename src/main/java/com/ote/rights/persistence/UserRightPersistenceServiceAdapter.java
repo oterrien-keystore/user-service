@@ -129,4 +129,9 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
             return new Privilege(entity.getCode());
         }
     }
+
+    @Override
+    public void put(String user, String application, Perimeter perimeter) {
+
+    }
 }

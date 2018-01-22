@@ -36,6 +36,7 @@ public class UserPersistenceRestController {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.User.name());
     }
 
+    //region Persistence
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -92,5 +93,13 @@ public class UserPersistenceRestController {
     @PreAuthorize("hasPermission('USER', 'WRITE')")
     public void delete(@RequestParam(required = false) Filters filters) {
         defaultController.delete(filters);
+    }
+    //endregion
+
+    @PutMapping("/{id}/user-rights")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void addUserRights(@RequestBody UserRightPayload userRightPayload){
+
     }
 }
