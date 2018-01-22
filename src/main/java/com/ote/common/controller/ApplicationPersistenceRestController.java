@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 @RestController
@@ -30,10 +29,9 @@ public class ApplicationPersistenceRestController {
     public IPersistenceService<ApplicationPayload> persistenceService;
 
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
-    private IPersistenceRestController<ApplicationPayload> defaultController;
+    private final IPersistenceRestController<ApplicationPayload> defaultController;
 
-    @PostConstruct
-    public void init() {
+    public ApplicationPersistenceRestController() {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Application.name());
     }
 

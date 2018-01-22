@@ -30,10 +30,9 @@ public class SecurityGroupPersistenceRestController {
     public IPersistenceService<SecurityGroupPayload> persistenceService;
 
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
-    private IPersistenceRestController<SecurityGroupPayload> defaultController;
+    private final IPersistenceRestController<SecurityGroupPayload> defaultController;
 
-    @PostConstruct
-    public void init() {
+    public SecurityGroupPersistenceRestController() {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.SecurityGroup.name());
     }
 

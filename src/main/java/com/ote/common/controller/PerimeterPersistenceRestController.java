@@ -31,10 +31,9 @@ public class PerimeterPersistenceRestController {
     private IPersistenceService<PerimeterPayload> persistenceService;
 
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
-    private IPersistenceRestController<PerimeterPayload> defaultController;
+    private final IPersistenceRestController<PerimeterPayload> defaultController;
 
-    @PostConstruct
-    public void init(){
+    public PerimeterPersistenceRestController(){
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Perimeter.name());
     }
 

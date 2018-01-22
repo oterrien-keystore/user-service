@@ -20,8 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
-
 @RestController
 @RequestMapping("/api/v1/users")
 @Slf4j
@@ -32,10 +30,9 @@ public class UserPersistenceRestController {
     private IPersistenceService<UserPayload> persistenceService;
 
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
-    private IPersistenceRestController<UserPayload> defaultController;
+    private final IPersistenceRestController<UserPayload> defaultController;
 
-    @PostConstruct
-    public void init() {
+    public UserPersistenceRestController() {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.User.name());
     }
 

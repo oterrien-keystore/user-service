@@ -31,10 +31,9 @@ public class PrivilegePersistenceRestController {
     private IPersistenceService<PrivilegePayload> persistenceService;
 
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
-    private IPersistenceRestController<PrivilegePayload> defaultController;
+    private final IPersistenceRestController<PrivilegePayload> defaultController;
 
-    @PostConstruct
-    public void init(){
+    public PrivilegePersistenceRestController(){
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Privilege.name());
     }
 
