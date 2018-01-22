@@ -3,6 +3,7 @@ package com.ote.rights.persistence;
 import com.ote.common.persistence.model.IRightDetail;
 import com.ote.common.persistence.model.PrivilegeEntity;
 import com.ote.common.persistence.model.SecurityGroupRightEntity;
+import com.ote.common.persistence.model.UserRightEntity;
 import com.ote.common.persistence.repository.*;
 import com.ote.user.rights.api.Path;
 import com.ote.user.rights.api.Perimeter;
@@ -12,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @Service
@@ -67,12 +65,12 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
 
         // Retrieve user's rights for the given application
         Optional.ofNullable(userRightJpaRepository.findByUserLoginAndApplicationCodeWithDetails(user, application)).
-                ifPresent(p -> rightDetails.addAll(p.getDetails()));
+                map(UserRightEntity::getDetails).
+                ifPresent(p -> rightDetails.addAll(p));
 
         // Retrieve user's rights inherited from its securityGroups for the given application
-        //UserEntity userEntity = userJpaRepository.findByLogin(user);
-        List<SecurityGroupRightEntity> securityGroupRights = securityGroupRightRepository.findByUserLoginAndApplicationCode(user, application);
-        securityGroupRights.stream().
+        securityGroupRightRepository.findByUserLoginAndApplicationCodeWithDetails(user, application).
+                stream().
                 map(SecurityGroupRightEntity::getDetails).
                 forEach(p -> rightDetails.addAll(p));
 
@@ -81,19 +79,20 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
 
     private class PerimeterAggregator implements Supplier<List<Perimeter>> {
 
-        private Map<String, Perimeter> perimeters = new HashMap<>();
+        private Map<String, Perimeter> perimetersMap = new HashMap<>();
 
         PerimeterAggregator(List<IRightDetail> details) {
 
             details.forEach(p -> {
                 String code = p.getPerimeter().getCode();
                 Perimeter perimeter =
-                        Optional.ofNullable(perimeters.get(code)).
+                        Optional.ofNullable(perimetersMap.get(code)).
                                 orElseGet(() -> {
                                     Perimeter p1 = new Perimeter(code);
-                                    perimeters.put(code, p1);
+                                    perimetersMap.put(code, p1);
                                     return p1;
                                 });
+
                 p.getPrivileges().
                         stream().
                         map(PrivilegeEntity::getCode).
@@ -102,12 +101,7 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
         }
 
         public List<Perimeter> get() {
-            return new ArrayList<>(perimeters.values());
-        }
-
-        private <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-            Map<Object, Boolean> map = new ConcurrentHashMap<>();
-            return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+            return new ArrayList<>(perimetersMap.values());
         }
     }
 

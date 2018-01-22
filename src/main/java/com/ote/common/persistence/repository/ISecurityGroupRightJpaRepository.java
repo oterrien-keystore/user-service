@@ -18,20 +18,6 @@ public interface ISecurityGroupRightJpaRepository extends IEntityRepository<Secu
 
     @Query("select case when count(sgr) > 0 then true else false end " +
             "from SecurityGroupRightEntity sgr " +
-            "where sgr.application.code = :application " +
-            "and :user member of sgr.securityGroup.users")
-    boolean existsByUserAndApplicationCode(@Param("user") UserEntity user,
-                                           @Param("application") String application);
-
-    @Query("select sgr from SecurityGroupRightEntity sgr " +
-            "left join fetch sgr.details " +
-            "where sgr.application.code = :application " +
-            "and :user member of sgr.securityGroup.users")
-    List<SecurityGroupRightEntity> findByUserAndApplicationCode(@Param("user") UserEntity user,
-                                                                @Param("application") String application);
-
-    @Query("select case when count(sgr) > 0 then true else false end " +
-            "from SecurityGroupRightEntity sgr " +
             "inner join sgr.securityGroup sg " +
             "inner join sg.users u " +
             "where sgr.application.code = :application " +
@@ -45,6 +31,6 @@ public interface ISecurityGroupRightJpaRepository extends IEntityRepository<Secu
             "inner join sg.users u " +
             "where sgr.application.code = :application " +
             "and u.login = :user")
-    List<SecurityGroupRightEntity> findByUserLoginAndApplicationCode(@Param("user") String user,
-                                                                     @Param("application") String application);
+    List<SecurityGroupRightEntity> findByUserLoginAndApplicationCodeWithDetails(@Param("user") String user,
+                                                                                @Param("application") String application);
 }

@@ -7,30 +7,12 @@ import com.ote.common.service.ApplicationContextProvider;
 import com.ote.crud.model.IPayload;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
 @Data
 @NoArgsConstructor
-@Slf4j
 public class PrivilegePayload implements IPayload {
-
-    private static IPrivilegeJpaRepository privilegeJpaRepository = null;
-
-    private static Object Lock = new Object();
-
-    private static IPrivilegeJpaRepository getPrivilegeJpaRepository() {
-        if (privilegeJpaRepository == null) {
-            synchronized (Lock) {
-                if (privilegeJpaRepository == null) {
-                    log.warn("Get privilegeJpaRepository from context");
-                    privilegeJpaRepository = ApplicationContextProvider.getContext().getBean(IPrivilegeJpaRepository.class);
-                }
-            }
-        }
-        return privilegeJpaRepository;
-    }
 
     private long id;
 
@@ -41,7 +23,7 @@ public class PrivilegePayload implements IPayload {
 
     @Override
     public PrivilegeEntity convert() {
-        IPrivilegeJpaRepository privilegeJpaRepository = getPrivilegeJpaRepository();
+        IPrivilegeJpaRepository privilegeJpaRepository = ApplicationContextProvider.getContext().getBean(IPrivilegeJpaRepository.class);
         PrivilegeEntity entity = new PrivilegeEntity();
         entity.setId(getId());
         entity.setCode(getCode());

@@ -78,7 +78,7 @@ public class UserRightDataInitializer {
 
         // Create Perimeters
         createPerimeters("DEAL", "DEAL/GLE",
-                "APPLICATION", "USER", "PERIMETER", "PRIVILEGE", "SECURITY_GROUP");
+                "APPLICATION", "USER", "PERIMETER", "PRIVILEGE", "SECURITY_GROUP", "USER_RIGHT");
 
         // Create Privileges
         createPrivileges(
@@ -100,7 +100,8 @@ public class UserRightDataInitializer {
                 new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "USER", "ADMIN"),
                 new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "PRIVILEGE", "ADMIN"),
                 new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "PERIMETER", "ADMIN"),
-                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "SECURITY_GROUP", "ADMIN")
+                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "SECURITY_GROUP", "ADMIN"),
+                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "USER_RIGHT", "ADMIN")
         );
     }
 
