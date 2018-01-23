@@ -12,10 +12,4 @@ public interface IApplicationJpaRepository extends IEntityRepository<Application
     boolean existsByCode(String code);
 
     ApplicationEntity findByCode(String code);
-
-    @Query("select a from ApplicationEntity a " +
-            "left join fetch a.userRights ur " +
-            "left join fetch ur.details urd " +
-            "where a.code = :code")
-    ApplicationEntity findByCodeWithUserRights(@Param("code") String code);
 }

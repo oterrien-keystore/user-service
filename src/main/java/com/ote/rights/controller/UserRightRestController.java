@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/rights")
 @Slf4j
-public class UserRightCheckRestController {
+public class UserRightRestController {
 
     @Autowired
     private IUserRightService userRightService;
@@ -24,4 +24,5 @@ public class UserRightCheckRestController {
                                                                  @RequestParam("privilege") String privilege) throws Exception {
         return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeter, privilege);
     }
+
 }

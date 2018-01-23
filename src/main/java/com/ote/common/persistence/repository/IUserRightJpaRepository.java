@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface IUserRightJpaRepository extends JpaRepository<UserRightEntity, Long> {
 
@@ -19,4 +21,9 @@ public interface IUserRightJpaRepository extends JpaRepository<UserRightEntity, 
             "and u.application.code = :application")
     UserRightEntity findByUserLoginAndApplicationCodeWithDetails(@Param("user") String user,
                                                                  @Param("application") String application);
+
+    @Query("select distinct u from UserRightEntity u " +
+            "left join fetch u.details " +
+            "where u.user.id = :userId")
+    List<UserRightEntity> findByUserIdWithDetails(@Param("userId") long userId);
 }

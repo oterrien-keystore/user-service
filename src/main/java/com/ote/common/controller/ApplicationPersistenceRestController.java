@@ -25,13 +25,10 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class ApplicationPersistenceRestController {
 
-    @Autowired
-    public IPersistenceService<ApplicationPayload> persistenceService;
-
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
     private final IPersistenceRestController<ApplicationPayload> defaultController;
 
-    public ApplicationPersistenceRestController() {
+    public ApplicationPersistenceRestController(@Autowired IPersistenceService<ApplicationPayload> persistenceService) {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Application.name());
     }
 

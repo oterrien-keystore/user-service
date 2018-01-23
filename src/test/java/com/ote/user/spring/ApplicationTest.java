@@ -50,34 +50,6 @@ public class ApplicationTest {
             Assertions.assertThat(entity).isNotNull();
             Assertions.assertThat(entity.getId()).isPositive();
             Assertions.assertThat(entity.getCode()).isEqualTo(application);
-            Assertions.assertThatThrownBy(() -> System.out.println(entity.getUserRights())).isInstanceOf(LazyInitializationException.class);
         }
-    }
-
-    @Test
-    public void readingApplicationWithDetails() {
-        String application = "USER_SERVICE";
-        Assumptions.assumeTrue(applicationJpaRepository.existsByCode(application));
-
-        ApplicationEntity entity = applicationJpaRepository.findByCodeWithUserRights(application);
-        Assertions.assertThat(entity).isNotNull();
-        Assertions.assertThat(entity.getId()).isPositive();
-        Assertions.assertThat(entity.getCode()).isEqualTo(application);
-
-        Set<UserRightEntity> userRightEntities = entity.getUserRights();
-        Assertions.assertThat(userRightEntities).isNotEmpty();
-        Assertions.assertThat(userRightEntities).hasSize(1);
-
-        UserRightEntity userRightEntity = userRightEntities.stream().findFirst().orElse(null);
-        Assumptions.assumeTrue(userRightEntity != null);
-
-        Assertions.assertThat(userRightEntity.getApplication()).isNotNull();
-        Assertions.assertThat(userRightEntity.getApplication().getCode()).isEqualTo(application);
-        Assertions.assertThat(userRightEntity.getUser()).isNotNull();
-        Assertions.assertThat(userRightEntity.getUser().getLogin()).isEqualTo("user1");
-
-        Assertions.assertThat(userRightEntity.getDetails()).isNotEmpty();
-        Assertions.assertThat(userRightEntity.getDetails()).hasSize(1);
-
     }
 }

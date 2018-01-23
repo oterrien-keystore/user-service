@@ -4,7 +4,7 @@ security.basic.enabled: false
 
 spring:
   application.name: USER_SERVICE
-  profiles.active: mockUserRightData
+#  profiles.active: mockUserRightData
   main.banner-mode: LOG
   datasource:
     url: jdbc:postgresql://localhost:5432/users

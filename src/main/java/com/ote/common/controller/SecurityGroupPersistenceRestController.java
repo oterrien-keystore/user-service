@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 @RestController
@@ -26,13 +25,10 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class SecurityGroupPersistenceRestController {
 
-    @Autowired
-    public IPersistenceService<SecurityGroupPayload> persistenceService;
-
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
     private final IPersistenceRestController<SecurityGroupPayload> defaultController;
 
-    public SecurityGroupPersistenceRestController() {
+    public SecurityGroupPersistenceRestController(@Autowired IPersistenceService<SecurityGroupPayload> persistenceService) {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.SecurityGroup.name());
     }
 

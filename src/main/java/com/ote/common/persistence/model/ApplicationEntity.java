@@ -29,9 +29,6 @@ public class ApplicationEntity implements IEntity, Serializable {
     @Column(name = "CODE", nullable = false)
     private String code;
 
-    @OneToMany(mappedBy = "application")
-    private Set<UserRightEntity> userRights;
-
     @Override
     public ApplicationPayload convert() {
         ApplicationPayload payload = new ApplicationPayload();

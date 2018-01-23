@@ -9,7 +9,6 @@ import com.ote.crud.exception.MergeException;
 import com.ote.crud.exception.NotFoundException;
 import com.ote.crud.exception.ResetException;
 import com.ote.crud.model.*;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 @RestController
@@ -27,13 +25,10 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class PrivilegePersistenceRestController {
 
-    @Autowired
-    private IPersistenceService<PrivilegePayload> persistenceService;
-
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
     private final IPersistenceRestController<PrivilegePayload> defaultController;
 
-    public PrivilegePersistenceRestController(){
+    public PrivilegePersistenceRestController(@Autowired IPersistenceService<PrivilegePayload> persistenceService) {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Privilege.name());
     }
 

@@ -12,6 +12,7 @@ import com.ote.crud.model.Filters;
 import com.ote.crud.model.SortingParameters;
 import com.ote.crud.model.SplitList;
 import com.ote.crud.model.SplitListParameter;
+import com.ote.rights.controller.UserRightPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,13 +27,10 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class UserPersistenceRestController {
 
-    @Autowired
-    private IPersistenceService<UserPayload> persistenceService;
-
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
     private final IPersistenceRestController<UserPayload> defaultController;
 
-    public UserPersistenceRestController() {
+    public UserPersistenceRestController(@Autowired IPersistenceService<UserPayload> persistenceService) {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.User.name());
     }
 
@@ -99,7 +97,7 @@ public class UserPersistenceRestController {
     @PutMapping("/{id}/user-rights")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void addUserRights(@RequestBody UserRightPayload userRightPayload){
+    public void addUserRights(@RequestBody UserRightPayload userRightPayload) {
 
     }
 }

@@ -27,13 +27,10 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class PerimeterPersistenceRestController {
 
-    @Autowired
-    private IPersistenceService<PerimeterPayload> persistenceService;
-
     // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
     private final IPersistenceRestController<PerimeterPayload> defaultController;
 
-    public PerimeterPersistenceRestController(){
+    public PerimeterPersistenceRestController(@Autowired IPersistenceService<PerimeterPayload> persistenceService){
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Perimeter.name());
     }
 
