@@ -1,9 +1,7 @@
 package com.ote.common.persistence.repository;
 
-import com.ote.common.persistence.model.SecurityGroupRightDetailEntity;
 import com.ote.common.persistence.model.UserRightDetailEntity;
 import com.ote.crud.IEntityRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;

@@ -35,9 +35,6 @@ public class UserEntity implements IEntity, Serializable {
     @OneToMany(mappedBy = "user")
     private Set<UserRightEntity> userRights;
 
-    @ManyToMany(mappedBy = "users")
-    private Set<SecurityGroupEntity> securityGroups;
-
     @Override
     public UserPayload convert() {
         UserPayload payload = new UserPayload();

@@ -2,7 +2,6 @@ package com.ote.rights.persistence;
 
 import com.ote.common.persistence.model.IRightDetail;
 import com.ote.common.persistence.model.PrivilegeEntity;
-import com.ote.common.persistence.model.SecurityGroupRightEntity;
 import com.ote.common.persistence.model.UserRightEntity;
 import com.ote.common.persistence.repository.*;
 import com.ote.user.rights.api.Path;
@@ -33,15 +32,6 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
     @Autowired
     private IUserRightJpaRepository userRightJpaRepository;
 
-    @Autowired
-    private ISecurityGroupJpaRepository securityGroupRepository;
-
-    @Autowired
-    private ISecurityGroupRightJpaRepository securityGroupRightRepository;
-
-    @Autowired
-    private ISecurityGroupRightDetailJpaRepository securityGroupRightDetailRepository;
-
     @Override
     public boolean isUserDefined(String user) {
         return userJpaRepository.existsByLogin(user);
@@ -54,8 +44,7 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
 
     @Override
     public boolean isRoleDefined(String user, String application) {
-        return userRightJpaRepository.existsByUserLoginAndApplicationCode(user, application) ||
-                securityGroupRightRepository.existsByUserLoginAndApplicationCode(user, application);
+        return userRightJpaRepository.existsByUserLoginAndApplicationCode(user, application);
     }
 
     @Override
@@ -67,12 +56,6 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
         Optional.ofNullable(userRightJpaRepository.findByUserLoginAndApplicationCodeWithDetails(user, application)).
                 map(UserRightEntity::getDetails).
                 ifPresent(p -> rightDetails.addAll(p));
-
-        // Retrieve user's rights inherited from its securityGroups for the given application
-        securityGroupRightRepository.findByUserLoginAndApplicationCodeWithDetails(user, application).
-                stream().
-                map(SecurityGroupRightEntity::getDetails).
-                forEach(p -> rightDetails.addAll(p));
 
         return new PerimeterAggregator(rightDetails).get();
     }

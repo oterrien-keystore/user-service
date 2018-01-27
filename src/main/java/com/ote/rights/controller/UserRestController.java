@@ -1,9 +1,7 @@
 package com.ote.rights.controller;
 
 import com.ote.common.persistence.model.IRightDetail;
-import com.ote.common.persistence.model.SecurityGroupRightEntity;
 import com.ote.common.persistence.model.UserRightEntity;
-import com.ote.common.persistence.repository.ISecurityGroupRightJpaRepository;
 import com.ote.common.persistence.repository.IUserRightJpaRepository;
 import com.ote.user.rights.api.IUserRightService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -27,21 +24,18 @@ public class UserRestController {
     @Autowired
     private IUserRightJpaRepository userRightJpaRepository;
 
-    @Autowired
-    private ISecurityGroupRightJpaRepository securityGroupRightJpaRepository;
+    @GetMapping(value = "/rights/granted", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(@RequestParam("user") String user,
+                                                                 @ModelAttribute UserRightPayload userRightPayload) throws Exception {
+        return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, userRightPayload.getApplication(), userRightPayload.getPerimeter(), userRightPayload.getPrivilege());
+    }
 
     @GetMapping(value = "/{id}/rights", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserRightPayloadSplit getRights(@PathVariable("id") long id) {
-
-        UserRightPayloadSplit payload = new UserRightPayloadSplit();
-        payload.setUserRights(getUserRights(id));
-        payload.setSecurityGroupRights(getSecurityGroupRights(id));
-        return payload;
-    }
-
-    private List<UserRightOrganizedPayload> getUserRights(long id) {
+    public List<UserRightOrganizedPayload> getRights(@PathVariable("id") long id) {
         List<UserRightEntity> userRights = userRightJpaRepository.findByUserIdWithDetails(id);
         return userRights.stream().
                 map(p -> {
@@ -56,44 +50,6 @@ public class UserRestController {
         userRightOrganizedPayload.setApplication(userRightEntity.getApplication().getCode());
         userRightOrganizedPayload.setPerimeters(new HashSet<>());
         return userRightOrganizedPayload;
-    }
-
-    private List<UserRightPayloadSplit.UserRightInheritedPayload> getSecurityGroupRights(long id) {
-        List<SecurityGroupRightEntity> securityGroupRights = securityGroupRightJpaRepository.findByUserIdWithDetails(id);
-        List<UserRightPayloadSplit.UserRightInheritedPayload> result = new ArrayList<>();
-        securityGroupRights.forEach(p -> {
-            UserRightPayloadSplit.UserRightInheritedPayload inheritedRight = getInheritedRight(result, p);
-            UserRightOrganizedPayload userRightOrganizedPayload = getUserRights(inheritedRight, p);
-            populatePerimeter(userRightOrganizedPayload.getPerimeters(), p.getDetails());
-        });
-        return result;
-    }
-
-    private UserRightPayloadSplit.UserRightInheritedPayload getInheritedRight(List<UserRightPayloadSplit.UserRightInheritedPayload> result, SecurityGroupRightEntity securityGroupRightEntity) {
-        return result.
-                stream().filter(u -> u.getSecurityGroup().equalsIgnoreCase(securityGroupRightEntity.getSecurityGroup().getCode())).
-                findAny().
-                orElseGet(() -> {
-                    UserRightPayloadSplit.UserRightInheritedPayload a = new UserRightPayloadSplit.UserRightInheritedPayload();
-                    a.setSecurityGroup(securityGroupRightEntity.getSecurityGroup().getCode());
-                    a.setUserRights(new ArrayList<>());
-                    result.add(a);
-                    return a;
-                });
-    }
-
-    private UserRightOrganizedPayload getUserRights(UserRightPayloadSplit.UserRightInheritedPayload inheritedRight, SecurityGroupRightEntity securityGroupRightEntity) {
-        return inheritedRight.getUserRights().
-                stream().
-                filter(u -> u.getApplication().equalsIgnoreCase(securityGroupRightEntity.getApplication().getCode())).
-                findAny().
-                orElseGet(() -> {
-                    UserRightOrganizedPayload a = new UserRightOrganizedPayload();
-                    a.setApplication(securityGroupRightEntity.getApplication().getCode());
-                    a.setPerimeters(new HashSet<>());
-                    inheritedRight.getUserRights().add(a);
-                    return a;
-                });
     }
 
     private <T extends IRightDetail> void populatePerimeter(Collection<UserRightOrganizedPayload.Perimeter> perimeters, Collection<T> rightDetails) {

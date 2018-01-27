@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class UserPersistenceRestController {
 
-    // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
+    // NB: the current RestController implements the interface, endpoints are not visible -> use a delegate
     private final IPersistenceRestController<UserPayload> defaultController;
 
     public UserPersistenceRestController(@Autowired IPersistenceService<UserPayload> persistenceService) {
@@ -93,11 +93,4 @@ public class UserPersistenceRestController {
         defaultController.delete(filters);
     }
     //endregion
-
-    @PutMapping("/{id}/user-rights")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public void addUserRights(@RequestBody UserRightPayload userRightPayload) {
-
-    }
 }
