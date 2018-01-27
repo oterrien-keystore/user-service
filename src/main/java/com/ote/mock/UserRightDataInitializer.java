@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Profile("mockUserRightData")
@@ -44,15 +43,6 @@ public class UserRightDataInitializer {
 
     @Autowired
     private IUserRightDetailJpaRepository userRightDetailRepository;
-
-    @Autowired
-    private ISecurityGroupJpaRepository securityGroupRepository;
-
-    @Autowired
-    private ISecurityGroupRightJpaRepository securityGroupRightRepository;
-
-    @Autowired
-    private ISecurityGroupRightDetailJpaRepository securityGroupRightDetailRepository;
 
     public UserRightDataInitializer() {
         log.warn("###### MOCK ##### ");
@@ -90,28 +80,12 @@ public class UserRightDataInitializer {
         createUserRights(
                 new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL", "READ"),
                 new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL/GLE", "WRITE"));
-
-        // Create Security Group
-        createSecurityGroup(new SecurityGroup("USER_SERVICE_ADMINS", "olivier.terrien"));
-
-        // Create Security Group Rights
-        createSecurityGroupRight(
-                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "APPLICATION", "ADMIN"),
-                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "USER", "ADMIN"),
-                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "PRIVILEGE", "ADMIN"),
-                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "PERIMETER", "ADMIN"),
-                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "SECURITY_GROUP", "ADMIN"),
-                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "USER_RIGHT", "ADMIN")
-        );
     }
 
     public void clean() {
         log.warn("###### MOCK ##### Clean database");
         userRightDetailRepository.deleteAll();
         userRightRepository.deleteAll();
-        securityGroupRightDetailRepository.deleteAll();
-        securityGroupRightRepository.deleteAll();
-        securityGroupRepository.deleteAll();
         userRepository.deleteAll();
         applicationRepository.deleteAll();
         perimeterRepository.deleteAll();
@@ -221,61 +195,6 @@ public class UserRightDataInitializer {
                 });
     }
 
-    private void createSecurityGroup(SecurityGroup... securityGroups) {
-        Stream.of(securityGroups).
-                peek(p -> p.users.forEach(u -> {
-                    assert userRepository.existsByLogin(u) : "User " + u + " should exist";
-                })).
-                forEach(p -> {
-                    SecurityGroupEntity securityGroupEntity = new SecurityGroupEntity();
-                    securityGroupEntity.setCode(p.code);
-                    securityGroupEntity.setUsers(p.users.stream().map(u -> userRepository.findByLogin(u)).collect(Collectors.toSet()));
-                    if (!securityGroupRepository.existsByCode(p.code)) {
-                        securityGroupRepository.save(securityGroupEntity);
-                        securityGroupRepository.flush();
-                    }
-                });
-    }
-
-    private void createSecurityGroupRight(SecurityGroupRight... securityGroupRights) {
-        Stream.of(securityGroupRights).
-                peek(p -> {
-                    String messageTemplate = "%s %s should exist";
-                    assert securityGroupRepository.existsByCode(p.code) : String.format(messageTemplate, "SecurityGroup", p.code);
-                    assert applicationRepository.existsByCode(p.application) : String.format(messageTemplate, "Application", p.application);
-                    assert perimeterRepository.existsByCode(p.perimeter) : String.format(messageTemplate, "Perimeter", p.perimeter);
-                    p.privileges.forEach(pr -> {
-                        assert privilegeRepository.existsByCode(pr) : String.format(messageTemplate, "Privilege", pr);
-                    });
-                }).
-                forEach(p -> {
-                    SecurityGroupRightEntity securityGroupRightEntity;
-                    if (securityGroupRightRepository.existsBySecurityGroupCodeAndApplicationCode(p.code, p.application)) {
-                        securityGroupRightEntity = securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCode(p.code, p.application);
-                    } else {
-                        securityGroupRightEntity = new SecurityGroupRightEntity();
-                        securityGroupRightEntity.setSecurityGroup(securityGroupRepository.findByCode(p.code));
-                        securityGroupRightEntity.setApplication(applicationRepository.findByCode(p.application));
-                        securityGroupRightEntity = securityGroupRightRepository.save(securityGroupRightEntity);
-                    }
-
-                    SecurityGroupRightDetailEntity securityGroupRightDetailEntity;
-                    if (securityGroupRightDetailRepository.existsBySecurityGroupCodeAndApplicationCodeAndPerimeterCode(p.code, p.application, p.perimeter)) {
-                        securityGroupRightDetailEntity = securityGroupRightDetailRepository.findBySecurityGroupCodeAndApplicationCodeAndPerimeterCode(p.code, p.application, p.perimeter);
-                    } else {
-                        securityGroupRightDetailEntity = new SecurityGroupRightDetailEntity();
-                        securityGroupRightDetailEntity.setSecurityGroupRight(securityGroupRightEntity);
-                        securityGroupRightDetailEntity.setPerimeter(perimeterRepository.findByCode(p.perimeter));
-                        securityGroupRightDetailEntity.setPrivileges(new HashSet<>());
-                    }
-                    p.privileges.stream().
-                            map(privilegeRepository::findByCode).
-                            forEach(pr -> securityGroupRightDetailEntity.getPrivileges().add(pr));
-                    securityGroupRightDetailRepository.save(securityGroupRightDetailEntity);
-                    securityGroupRightDetailRepository.flush();
-                });
-    }
-
     @RequiredArgsConstructor
     private class Privilege {
         private final String code;
@@ -305,29 +224,4 @@ public class UserRightDataInitializer {
             this.privileges = Arrays.asList(privileges);
         }
     }
-
-    private class SecurityGroup {
-        private final String code;
-        private final List<String> users;
-
-        SecurityGroup(String code, String... users) {
-            this.code = code;
-            this.users = Arrays.asList(users);
-        }
-    }
-
-    private class SecurityGroupRight {
-        private final String code;
-        private final String application;
-        private final String perimeter;
-        private final List<String> privileges;
-
-        SecurityGroupRight(String code, String application, String perimeter, String... privileges) {
-            this.code = code;
-            this.application = application;
-            this.perimeter = perimeter;
-            this.privileges = Arrays.asList(privileges);
-        }
-    }
-
 }

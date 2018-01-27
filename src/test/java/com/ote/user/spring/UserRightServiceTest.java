@@ -35,15 +35,16 @@ public class UserRightServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-            "user1, TEST_SERVICE, PARENT, READ, True, user1 should own READ on PARENT",
-            "user1, TEST_SERVICE, PARENT, OTHER, False, user1 should not own OTHER on PARENT",
-            "user1, TEST_SERVICE, PARENT/CHILD, READ, True, user1 should own READ on PARENT/CHILD (inherited from PARENT)",
-            "user1, TEST_SERVICE, PARENT, ADMIN, True, user1 should own ADMIN on PARENT",
-            "user1, TEST_SERVICE, PARENT/CHILD, ADMIN, True, user1 should own ADMIN on PARENT/CHILD (inherited from PARENT)",
-            "user2, TEST_SERVICE, PARENT, WRITE, False, user2 should not own WRITE on PARENT",
-            "user2, TEST_SERVICE, PARENT/CHILD, READ, True, user2 should own READ on PARENT",
-            "user1, TEST_SERVICE, PARENT/CHILD, WRITE, True, user1 should own WRITE on PARENT (he owns ADMIN on PARENT)",
-            "user3, TEST_SERVICE, PARENT/CHILD, READ, True, user3 should own READ on PARENT/CHILD"})
+            "user1, USER_SERVICE, PARENT, READ, True, user1 should own READ on PARENT for USER_SERVICE",
+            "user1, USER_SERVICE, PARENT, WRITE, False, user1 should not own WRITE on PARENT for TEST_SERVICE",
+            "user1, TEST_SERVICE, PARENT, WRITE, True, user1 should own WRITE on PARENT for TEST_SERVICE",
+            "user1, TEST_SERVICE, PARENT, READ, True, user1 should own READ on PARENT  for TEST_SERVICE (WRITE provides READ)",
+            "user1, TEST_SERVICE, PARENT, ADMIN, False, user1 should not own ADMIN on PARENT for TEST_SERVICE",
+            "user1, TEST_SERVICE, PARENT/CHILD, WRITE, True, user1 should own WRITE on PARENT/CHILD for TEST_SERVICE (WRITE is inherited from PARENT)",
+            "user1, TEST_SERVICE, PARENT/CHILD, READ, True, user1 should own READ on PARENT/CHILD for TEST_SERVICE (WRITE is inherited from PARENT and provides READ)",
+            "user2, TEST_SERVICE, PARENT/CHILD, READ, True, user2 should own READ on PARENT for TEST_SERVICE",
+            "user2, TEST_SERVICE, PARENT, READ, False, user2 should not own READ on PARENT for TEST_SERVICE",
+            "user2, TEST_SERVICE, PARENT/CHILD, WRITE, False, user2 should not own WRITE on PARENT for TEST_SERVICE"})
     public void checkUserRightPrivilege(String user, String application, String perimeter, String privilege, boolean expectation, String description) {
 
         // Check with path Deal
