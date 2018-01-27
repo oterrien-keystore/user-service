@@ -4,15 +4,15 @@ security.basic.enabled: false
 
 spring:
   application.name: USER_SERVICE
-#  profiles.active: mockUserRightData
+  profiles.active: mockUserRightData
   main.banner-mode: LOG
   datasource:
     url: jdbc:postgresql://localhost:5432/users
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
-    initialize: true
-#    initialize: false
+#    initialize: true
+    initialize: false
     continue-on-error: true
     platform: postgres
   jpa:
@@ -21,7 +21,7 @@ spring:
       hibernate.dialect: org.hibernate.dialect.PostgreSQL92Dialect
     hibernate:
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-#      ddl-auto: none
-      ddl-auto: create-drop
+      ddl-auto: none
+#      ddl-auto: create-drop
 
 page.default.size: 20

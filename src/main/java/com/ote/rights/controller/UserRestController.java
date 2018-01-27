@@ -24,6 +24,14 @@ public class UserRestController {
     @Autowired
     private IUserRightJpaRepository userRightJpaRepository;
 
+    @GetMapping(value = "/rights/granted", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(@RequestParam("user") String user,
+                                                                 @ModelAttribute UserRightPayload userRightPayload) throws Exception {
+        return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, userRightPayload.getApplication(), userRightPayload.getPerimeter(), userRightPayload.getPrivilege());
+    }
+
     @GetMapping(value = "/{id}/rights", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

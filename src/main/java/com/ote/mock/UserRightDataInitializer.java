@@ -68,7 +68,7 @@ public class UserRightDataInitializer {
 
         // Create Perimeters
         createPerimeters("DEAL", "DEAL/GLE",
-                "APPLICATION", "USER", "PERIMETER", "PRIVILEGE", "SECURITY_GROUP", "USER_RIGHT");
+                "APPLICATION", "USER", "PERIMETER", "PRIVILEGE");
 
         // Create Privileges
         createPrivileges(
@@ -79,7 +79,11 @@ public class UserRightDataInitializer {
         //Create UserRights
         createUserRights(
                 new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL", "READ"),
-                new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL/GLE", "WRITE"));
+                new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL/GLE", "WRITE"),
+                new UserRight("olivier.terrien", "USER_SERVICE", "APPLICATION", "WRITE"),
+                new UserRight("olivier.terrien", "USER_SERVICE", "USER", "WRITE"),
+                new UserRight("olivier.terrien", "USER_SERVICE", "PERIMETER", "WRITE"),
+                new UserRight("olivier.terrien", "USER_SERVICE", "PRIVILEGE", "WRITE"));
     }
 
     public void clean() {
