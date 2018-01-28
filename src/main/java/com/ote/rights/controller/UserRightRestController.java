@@ -1,6 +1,6 @@
 package com.ote.rights.controller;
 
-import com.ote.user.rights.api.IUserRightService;
+import com.ote.user.rights.api.IRightCheckerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserRightRestController {
 
     @Autowired
-    private IUserRightService userRightService;
+    private IRightCheckerService userRightService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

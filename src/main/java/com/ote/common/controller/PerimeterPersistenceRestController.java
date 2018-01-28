@@ -34,6 +34,7 @@ public class PerimeterPersistenceRestController {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Perimeter.name());
     }
 
+    //region >>> Persistence <<<
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -87,8 +88,9 @@ public class PerimeterPersistenceRestController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasPermission('PERIMETER', 'WRITE')")
+    @PreAuthorize("hasPermission('PERIMETER', 'ADMIN')")
     public void delete(@RequestParam(required = false) Filters filters) {
         defaultController.delete(filters);
     }
+    //endregion
 }

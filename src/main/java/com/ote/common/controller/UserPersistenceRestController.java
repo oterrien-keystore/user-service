@@ -12,7 +12,6 @@ import com.ote.crud.model.Filters;
 import com.ote.crud.model.SortingParameters;
 import com.ote.crud.model.SplitList;
 import com.ote.crud.model.SplitListParameter;
-import com.ote.rights.controller.UserRightPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +33,7 @@ public class UserPersistenceRestController {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.User.name());
     }
 
-    //region Persistence
+    //region >>> Persistence <<<
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

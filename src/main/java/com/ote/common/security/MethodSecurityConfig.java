@@ -1,6 +1,6 @@
 package com.ote.common.security;
 
-import com.ote.user.rights.api.IUserRightService;
+import com.ote.user.rights.api.IRightCheckerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Autowired
-    private IUserRightService userRightService;
+    private IRightCheckerService userRightService;
 
     @Value("${spring.application.name}")
     private String applicationName;

@@ -39,10 +39,13 @@ public class UserRightDataInitializer {
     private IPrivilegeJpaRepository privilegeRepository;
 
     @Autowired
-    private IUserRightJpaRepository userRightRepository;
+    private ISecurityGroupJpaRepository securityGroupRepository;
 
     @Autowired
-    private IUserRightDetailJpaRepository userRightDetailRepository;
+    private ISecurityGroupRightJpaRepository securityGroupRightRepository;
+
+    @Autowired
+    private ISecurityGroupRightDetailJpaRepository securityGroupRightDetailRepository;
 
     public UserRightDataInitializer() {
         log.warn("###### MOCK ##### ");
@@ -55,20 +58,17 @@ public class UserRightDataInitializer {
     }
 
     public void init() {
-
         log.warn("###### MOCK ##### Init database with samples");
 
         // Create Users
         createUsers(
-                new User("olivier.terrien", "password"),
-                new User("maryline.terrien", "password"));
+                new User("olivier.terrien", "password"));
 
         // Create Applications
         createApplications("TEST_SERVICE", "USER_SERVICE");
 
         // Create Perimeters
-        createPerimeters("DEAL", "DEAL/GLE",
-                "APPLICATION", "USER", "PERIMETER", "PRIVILEGE");
+        createPerimeters("APPLICATION", "USER", "PERIMETER", "PRIVILEGE", "SECURITY_GROUP");
 
         // Create Privileges
         createPrivileges(
@@ -76,24 +76,33 @@ public class UserRightDataInitializer {
                 new Privilege("WRITE", "ADMIN"),
                 new Privilege("READ", "WRITE"));
 
-        //Create UserRights
-        createUserRights(
-                new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL", "READ"),
-                new UserRight("olivier.terrien", "TEST_SERVICE", "DEAL/GLE", "WRITE"),
-                new UserRight("olivier.terrien", "USER_SERVICE", "APPLICATION", "WRITE"),
-                new UserRight("olivier.terrien", "USER_SERVICE", "USER", "WRITE"),
-                new UserRight("olivier.terrien", "USER_SERVICE", "PERIMETER", "WRITE"),
-                new UserRight("olivier.terrien", "USER_SERVICE", "PRIVILEGE", "WRITE"));
+        // Create Security Group
+        createSecurityGroup("USER_SERVICE_ADMINS");
+
+        addUsersToSecurityGroup("USER_SERVICE_ADMINS", "olivier.terrien");
+
+        // Create Security Group Rights
+        createSecurityGroupRight(
+                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "APPLICATION", "ADMIN"),
+                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "USER", "ADMIN"),
+                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "PRIVILEGE", "ADMIN"),
+                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "PERIMETER", "ADMIN"),
+                new SecurityGroupRight("USER_SERVICE_ADMINS", "USER_SERVICE", "SECURITY_GROUP", "ADMIN"));
     }
 
     public void clean() {
-        log.warn("###### MOCK ##### Clean database");
-        userRightDetailRepository.deleteAll();
-        userRightRepository.deleteAll();
-        userRepository.deleteAll();
-        applicationRepository.deleteAll();
-        perimeterRepository.deleteAll();
-        privilegeRepository.deleteAll();
+        try {
+            log.warn("###### MOCK ##### Clean database");
+            securityGroupRightDetailRepository.deleteAll();
+            securityGroupRightRepository.deleteAll();
+            securityGroupRepository.deleteAll();
+            userRepository.deleteAll();
+            applicationRepository.deleteAll();
+            perimeterRepository.deleteAll();
+            privilegeRepository.deleteAll();
+        } catch (Exception e) {
+            log.info(e.getMessage(), e);
+        }
     }
 
     private void createUsers(User... users) {
@@ -163,11 +172,45 @@ public class UserRightDataInitializer {
                 });
     }
 
-    private void createUserRights(UserRight... userRights) {
-        Stream.of(userRights).
+    private void createSecurityGroup(String... securityGroups) {
+        Stream.of(securityGroups).
+                peek(p -> {
+                    assert securityGroupRepository.existsByCode(p) : "SecurityGroup " + p + " should exist";
+                }).
+                forEach(p -> {
+                    SecurityGroupEntity securityGroupEntity = new SecurityGroupEntity();
+                    securityGroupEntity.setCode(p);
+                    securityGroupEntity.setUsers(new HashSet<>());
+                    if (!securityGroupRepository.existsByCode(p)) {
+                        securityGroupRepository.save(securityGroupEntity);
+                        securityGroupRepository.flush();
+                    }
+                });
+    }
+
+    private void addUsersToSecurityGroup(String securityGroup, String... users) {
+
+        assert securityGroupRepository.existsByCode(securityGroup) : "SecurityGroup " + securityGroup + " should exist";
+
+        SecurityGroupEntity securityGroupEntity = securityGroupRepository.findByCode(securityGroup);
+
+        Stream.of(users).
+                peek(u -> {
+                    assert userRepository.existsByLogin(u) : "User " + u + " should exist";
+                }).
+                forEach(u -> {
+                    securityGroupEntity.getUsers().add(userRepository.findByLogin(u));
+                    securityGroupRepository.save(securityGroupEntity);
+                    securityGroupRepository.flush();
+                });
+    }
+
+
+    private void createSecurityGroupRight(SecurityGroupRight... securityGroupRights) {
+        Stream.of(securityGroupRights).
                 peek(p -> {
                     String messageTemplate = "%s %s should exist";
-                    assert userRepository.existsByLogin(p.user) : String.format(messageTemplate, "User", p.user);
+                    assert securityGroupRepository.existsByCode(p.code) : String.format(messageTemplate, "SecurityGroup", p.code);
                     assert applicationRepository.existsByCode(p.application) : String.format(messageTemplate, "Application", p.application);
                     assert perimeterRepository.existsByCode(p.perimeter) : String.format(messageTemplate, "Perimeter", p.perimeter);
                     p.privileges.forEach(pr -> {
@@ -175,27 +218,30 @@ public class UserRightDataInitializer {
                     });
                 }).
                 forEach(p -> {
-                    if (!userRightRepository.existsByUserLoginAndApplicationCode(p.user, p.application)) {
-                        UserRightEntity entity = new UserRightEntity();
-                        entity.setUser(userRepository.findByLogin(p.user));
-                        entity.setApplication(applicationRepository.findByCode(p.application));
-                        userRightRepository.save(entity);
-                        userRightRepository.flush();
-                    }
-                    UserRightDetailEntity userRightDetailEntity;
-                    if (userRightDetailRepository.existsByUserLoginAndApplicationCodeAndPerimeterCode(p.user, p.application, p.perimeter)) {
-                        userRightDetailEntity = userRightDetailRepository.findByUserLoginAndApplicationCodeAndPerimeterCode(p.user, p.application, p.perimeter);
+                    SecurityGroupRightEntity securityGroupRightEntity;
+                    if (securityGroupRightRepository.existsBySecurityGroupCodeAndApplicationCode(p.code, p.application)) {
+                        securityGroupRightEntity = securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCode(p.code, p.application);
                     } else {
-                        userRightDetailEntity = new UserRightDetailEntity();
-                        userRightDetailEntity.setUserRight(userRightRepository.findByUserLoginAndApplicationCode(p.user, p.application));
-                        userRightDetailEntity.setPerimeter(perimeterRepository.findByCode(p.perimeter));
-                        userRightDetailEntity.setPrivileges(new HashSet<>());
+                        securityGroupRightEntity = new SecurityGroupRightEntity();
+                        securityGroupRightEntity.setSecurityGroup(securityGroupRepository.findByCode(p.code));
+                        securityGroupRightEntity.setApplication(applicationRepository.findByCode(p.application));
+                        securityGroupRightEntity = securityGroupRightRepository.save(securityGroupRightEntity);
+                    }
+
+                    SecurityGroupRightDetailEntity securityGroupRightDetailEntity;
+                    if (securityGroupRightDetailRepository.existsBySecurityGroupCodeAndApplicationCodeAndPerimeterCode(p.code, p.application, p.perimeter)) {
+                        securityGroupRightDetailEntity = securityGroupRightDetailRepository.findBySecurityGroupCodeAndApplicationCodeAndPerimeterCode(p.code, p.application, p.perimeter);
+                    } else {
+                        securityGroupRightDetailEntity = new SecurityGroupRightDetailEntity();
+                        securityGroupRightDetailEntity.setSecurityGroupRight(securityGroupRightEntity);
+                        securityGroupRightDetailEntity.setPerimeter(perimeterRepository.findByCode(p.perimeter));
+                        securityGroupRightDetailEntity.setPrivileges(new HashSet<>());
                     }
                     p.privileges.stream().
                             map(privilegeRepository::findByCode).
-                            forEach(pr -> userRightDetailEntity.getPrivileges().add(pr));
-                    userRightDetailRepository.save(userRightDetailEntity);
-                    userRightDetailRepository.flush();
+                            forEach(pr -> securityGroupRightDetailEntity.getPrivileges().add(pr));
+                    securityGroupRightDetailRepository.save(securityGroupRightDetailEntity);
+                    securityGroupRightDetailRepository.flush();
                 });
     }
 
@@ -215,14 +261,14 @@ public class UserRightDataInitializer {
         private final String password;
     }
 
-    private class UserRight {
-        private final String user;
+    private class SecurityGroupRight {
+        private final String code;
         private final String application;
         private final String perimeter;
         private final List<String> privileges;
 
-        UserRight(String user, String application, String perimeter, String... privileges) {
-            this.user = user;
+        SecurityGroupRight(String code, String application, String perimeter, String... privileges) {
+            this.code = code;
             this.application = application;
             this.perimeter = perimeter;
             this.privileges = Arrays.asList(privileges);

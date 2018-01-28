@@ -20,19 +20,15 @@ public class UserRightRestControllerMock {
     @Autowired
     private WebConfigurationMock webConfiguration;
 
-    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, String perimeter, String privilege) {
-        try {
-            MvcResult result = webConfiguration.getMockMvc().perform(get(URI).
-                    contentType(MediaType.APPLICATION_JSON_VALUE).
-                    param("user", user).
-                    param("application", application).
-                    param("perimeter", perimeter).
-                    param("privilege", privilege)).
-                    andReturn();
+    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, String perimeter, String privilege) throws Exception {
+        MvcResult result = webConfiguration.getMockMvc().perform(get(URI).
+                contentType(MediaType.APPLICATION_JSON_VALUE).
+                param("user", user).
+                param("application", application).
+                param("perimeter", perimeter).
+                param("privilege", privilege)).
+                andReturn();
 
-            return JsonUtils.parse(result.getResponse().getContentAsString(), Boolean.class);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return JsonUtils.parse(result.getResponse().getContentAsString(), Boolean.class);
     }
 }

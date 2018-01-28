@@ -2,14 +2,10 @@ package com.ote.user.spring;
 
 import com.ote.UserServiceRunner;
 import com.ote.common.persistence.model.ApplicationEntity;
-import com.ote.common.persistence.model.UserRightEntity;
 import com.ote.common.persistence.repository.IApplicationJpaRepository;
 import org.assertj.core.api.Assertions;
-import org.hibernate.LazyInitializationException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.Set;
 
 @ActiveProfiles("Test")
 @ExtendWith(SpringExtension.class)
@@ -42,7 +36,7 @@ public class ApplicationTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"TEST_SERVICE, True", "UNKOWN, False"})
+    @CsvSource({"App1, True", "UNKOWN, False"})
     public void readingApplication(String application, boolean expectedResult) {
         Assertions.assertThat(applicationJpaRepository.existsByCode(application)).isEqualTo(expectedResult);
         if (expectedResult) {

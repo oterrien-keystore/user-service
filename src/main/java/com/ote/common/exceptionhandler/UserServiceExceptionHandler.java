@@ -45,10 +45,10 @@ public class UserServiceExceptionHandler {
         return new Error(exception.getMessage());
     }
 
-    @ExceptionHandler(RoleNotFoundException.class)
+    @ExceptionHandler(RightNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public Error handle(RoleNotFoundException exception) {
+    public Error handle(RightNotFoundException exception) {
         log.info(exception.getMessage(), exception);
         return new Error(exception.getMessage());
     }
