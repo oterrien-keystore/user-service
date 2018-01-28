@@ -35,20 +35,23 @@ public class UserRightServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-            "user1, USER_SERVICE, PARENT, READ, True, user1 should own READ on PARENT for USER_SERVICE",
-            "user1, USER_SERVICE, PARENT, WRITE, False, user1 should not own WRITE on PARENT for TEST_SERVICE",
-            "user1, TEST_SERVICE, PARENT, WRITE, True, user1 should own WRITE on PARENT for TEST_SERVICE",
-            "user1, TEST_SERVICE, PARENT, READ, True, user1 should own READ on PARENT  for TEST_SERVICE (WRITE provides READ)",
-            "user1, TEST_SERVICE, PARENT, ADMIN, False, user1 should not own ADMIN on PARENT for TEST_SERVICE",
-            "user1, TEST_SERVICE, PARENT/CHILD, WRITE, True, user1 should own WRITE on PARENT/CHILD for TEST_SERVICE (WRITE is inherited from PARENT)",
-            "user1, TEST_SERVICE, PARENT/CHILD, READ, True, user1 should own READ on PARENT/CHILD for TEST_SERVICE (WRITE is inherited from PARENT and provides READ)",
-            "user2, TEST_SERVICE, PARENT/CHILD, READ, True, user2 should own READ on PARENT for TEST_SERVICE",
-            "user2, TEST_SERVICE, PARENT, READ, False, user2 should not own READ on PARENT for TEST_SERVICE",
-            "user2, TEST_SERVICE, PARENT/CHILD, WRITE, False, user2 should not own WRITE on PARENT for TEST_SERVICE"})
-    public void checkUserRightPrivilege(String user, String application, String perimeter, String privilege, boolean expectation, String description) {
+            "user1, App1, PARENT, READ, True, user1 should own READ on PARENT for App1 (admin of App1/PARENT)",
+            "user1, App1, PARENT, WRITE, True, user1 should own WRITE on PARENT for App1 (admin of App1/PARENT)",
+            "user1, App1, PARENT, ADMIN, True, user1 should own ADMIN on PARENT for App1 (admin of App1/PARENT)",
+            "user1, App1, PARENT/CHILD, ADMIN, True, user1 should own ADMIN on each children of PARENT for App1 (admin of App1/PARENT)",
+            "user1, App1, PARENT/CHILD, WRITE, True, user1 should own each sub privilege from ADMIN on each children of PARENT for App1 (admin of App1/PARENT)",
+            "user1, App2, PARENT, ADMIN, True, user1 should own ADMIN on PARENT for App2 (admin of App2/PARENT)",
+            "user2, App1, PARENT, ADMIN, False, user2 should not own ADMIN on PARENT for App1",
+            "user2, App1, PARENT, WRITE, True, user2 should own WRITE on PARENT for App1",
+            "user2, App1, PARENT/CHILD, WRITE, True, user2 should own WRITE on each children of PARENT for App1",
+            "user2, App1, PARENT, READ, True, user2 should own READ on PARENT for App1",
+            "user2, App1, PARENT/CHILD, READ, True, user2 should own READ on PARENT for App1",
+            "user3, App1, PARENT/CHILD, READ, True, user3 should own READ on PARENT/CHILD for App1"})
+    public void checkUserRightPrivilege(String user, String application, String perimeter, String privilege, boolean expectation, String description) throws Exception {
 
         // Check with path Deal
         boolean hasPrivilege = userRightRestControllerMock.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeter, privilege);
         Assertions.assertThat(hasPrivilege).as(description).isEqualTo(expectation);
     }
+
 }

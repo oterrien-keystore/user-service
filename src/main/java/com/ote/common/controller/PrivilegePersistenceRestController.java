@@ -32,6 +32,7 @@ public class PrivilegePersistenceRestController {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Privilege.name());
     }
 
+    //region >>> Persistence <<<
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -85,8 +86,9 @@ public class PrivilegePersistenceRestController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasPermission('PRIVILEGE', 'WRITE')")
+    @PreAuthorize("hasPermission('PRIVILEGE', 'ADMIN')")
     public void delete(@RequestParam(required = false) Filters filters) {
         defaultController.delete(filters);
     }
+    //endregion
 }

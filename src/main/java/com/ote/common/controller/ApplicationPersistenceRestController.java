@@ -32,6 +32,7 @@ public class ApplicationPersistenceRestController {
         defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Application.name());
     }
 
+    //region >>> Persistence <<<
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -85,8 +86,9 @@ public class ApplicationPersistenceRestController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasPermission('APPLICATION', 'WRITE')")
+    @PreAuthorize("hasPermission('APPLICATION', 'ADMIN')")
     public void delete(@RequestParam(required = false) Filters filters) {
         defaultController.delete(filters);
     }
+    //endregion
 }

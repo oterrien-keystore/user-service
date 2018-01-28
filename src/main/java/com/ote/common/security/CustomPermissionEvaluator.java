@@ -1,6 +1,6 @@
 package com.ote.common.security;
 
-import com.ote.user.rights.api.IUserRightService;
+import com.ote.user.rights.api.IRightCheckerService;
 import com.ote.user.rights.api.exception.UserRightServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Slf4j
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
-    private final IUserRightService userRightService;
+    private final IRightCheckerService userRightService;
 
     private final String applicationName;
 

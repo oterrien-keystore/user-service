@@ -1,22 +1,9 @@
 package com.ote.rights.controller;
 
-import com.ote.common.persistence.model.IRightDetail;
-import com.ote.common.persistence.model.UserRightEntity;
-import com.ote.common.persistence.repository.IUserRightJpaRepository;
-import com.ote.user.rights.api.IUserRightService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
-@RestController
+/*@RestController
 @RequestMapping("/api/v1/users")
 public class UserRestController {
+
 
     @Autowired
     private IUserRightService userRightService;
@@ -89,4 +76,6 @@ public class UserRestController {
     }
 
 
+
 }
+*/

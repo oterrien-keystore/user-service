@@ -32,9 +32,6 @@ public class UserEntity implements IEntity, Serializable {
     @Column(name = "PASSWORD", nullable = false, length = 128)
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private Set<UserRightEntity> userRights;
-
     @Override
     public UserPayload convert() {
         UserPayload payload = new UserPayload();

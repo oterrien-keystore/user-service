@@ -1,21 +1,22 @@
 package com.ote.rights.persistence;
 
-import com.ote.common.persistence.model.IRightDetail;
 import com.ote.common.persistence.model.PrivilegeEntity;
-import com.ote.common.persistence.model.UserRightEntity;
+import com.ote.common.persistence.model.SecurityGroupRightDetailEntity;
+import com.ote.common.persistence.model.SecurityGroupRightEntity;
 import com.ote.common.persistence.repository.*;
 import com.ote.user.rights.api.Path;
 import com.ote.user.rights.api.Perimeter;
 import com.ote.user.rights.api.Privilege;
-import com.ote.user.rights.spi.IUserRightRepository;
+import com.ote.user.rights.spi.IRightCheckerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service
-public class UserRightPersistenceServiceAdapter implements IUserRightRepository {
+public class UserRightPersistenceServiceAdapter implements IRightCheckerRepository {
 
     @Autowired
     private IUserJpaRepository userJpaRepository;
@@ -30,7 +31,13 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
     private IPrivilegeJpaRepository privilegeJpaRepository;
 
     @Autowired
-    private IUserRightJpaRepository userRightJpaRepository;
+    private ISecurityGroupJpaRepository securityGroupRepository;
+
+    @Autowired
+    private ISecurityGroupRightJpaRepository securityGroupRightRepository;
+
+    @Autowired
+    private ISecurityGroupRightDetailJpaRepository securityGroupRightDetailRepository;
 
     @Override
     public boolean isUserDefined(String user) {
@@ -44,27 +51,28 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
 
     @Override
     public boolean isRoleDefined(String user, String application) {
-        return userRightJpaRepository.existsByUserLoginAndApplicationCode(user, application);
+        return securityGroupRightRepository.existsByUserLoginAndApplicationCode(user, application);
     }
 
     @Override
     public List<Perimeter> getPerimeters(String user, String application) {
 
-        List<IRightDetail> rightDetails = new ArrayList<>();
-
-        // Retrieve user's rights for the given application
-        Optional.ofNullable(userRightJpaRepository.findByUserLoginAndApplicationCodeWithDetails(user, application)).
-                map(UserRightEntity::getDetails).
-                ifPresent(p -> rightDetails.addAll(p));
+        // Retrieve user's rights inherited from its securityGroups for the given application
+        List<SecurityGroupRightDetailEntity> rightDetails =
+                securityGroupRightRepository.findByUserLoginAndApplicationCodeWithDetails(user, application).
+                        stream().
+                        map(SecurityGroupRightEntity::getDetails).
+                        flatMap(Collection::stream).
+                        collect(Collectors.toList());
 
         return new PerimeterAggregator(rightDetails).get();
     }
 
-    private class PerimeterAggregator implements Supplier<List<Perimeter>> {
+    private static class PerimeterAggregator implements Supplier<List<Perimeter>> {
 
         private Map<String, Perimeter> perimetersMap = new HashMap<>();
 
-        PerimeterAggregator(List<IRightDetail> details) {
+        PerimeterAggregator(List<SecurityGroupRightDetailEntity> details) {
 
             details.forEach(p -> {
                 String code = p.getPerimeter().getCode();
@@ -111,10 +119,5 @@ public class UserRightPersistenceServiceAdapter implements IUserRightRepository 
         } else {
             return new Privilege(entity.getCode());
         }
-    }
-
-    @Override
-    public void put(String user, String application, Perimeter perimeter) {
-
     }
 }
