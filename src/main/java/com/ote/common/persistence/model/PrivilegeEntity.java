@@ -1,6 +1,6 @@
 package com.ote.common.persistence.model;
 
-import com.ote.common.controller.PrivilegePayload;
+import com.ote.common.payload.PrivilegePayload;
 import com.ote.crud.model.IEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Setter
 @ToString(of = "code")
 @EqualsAndHashCode(of = "code")
-@Table(name = "T_PRIVILEGE", uniqueConstraints = @UniqueConstraint(name = "AK_PRIVILEGE", columnNames = {"CODE", "PARENT_ID"}))
+@Table(name = "T_PRIVILEGE", uniqueConstraints = @UniqueConstraint(name = "AK_PRIVILEGE", columnNames = {"CODE"}))
 public class PrivilegeEntity implements IEntity, Serializable {
 
     private static final long serialVersionUID = 1L;

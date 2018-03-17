@@ -1,8 +1,6 @@
 package com.ote.common.persistence.repository;
 
 import com.ote.common.persistence.model.SecurityGroupRightEntity;
-import com.ote.common.persistence.model.UserEntity;
-import com.ote.crud.IEntityRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +13,17 @@ public interface ISecurityGroupRightJpaRepository extends JpaRepository<Security
 
     boolean existsBySecurityGroupCodeAndApplicationCode(String securityGroup, String application);
 
-    SecurityGroupRightEntity findBySecurityGroupCodeAndApplicationCode(String securityGroup, String application);
+    @Query("select distinct sgr from SecurityGroupRightEntity sgr " +
+            "left join fetch sgr.details " +
+            "where sgr.securityGroup.code = :securityGroup ")
+    List<SecurityGroupRightEntity> findBySecurityGroupCodeWithDetails(@Param("securityGroup") String securityGroup);
+
+    @Query("select distinct sgr from SecurityGroupRightEntity sgr " +
+            "left join fetch sgr.details " +
+            "where sgr.securityGroup.code = :securityGroup " +
+            "and sgr.application.code = :application")
+    SecurityGroupRightEntity findBySecurityGroupCodeAndApplicationCodeWithDetails(@Param("securityGroup") String securityGroup,
+                                                                                  @Param("application") String application);
 
     @Query("select case when count(sgr) > 0 then true else false end " +
             "from SecurityGroupRightEntity sgr " +
@@ -24,7 +32,7 @@ public interface ISecurityGroupRightJpaRepository extends JpaRepository<Security
             "where sgr.application.code = :application " +
             "and u.login = :user")
     boolean existsByUserLoginAndApplicationCode(@Param("user") String user,
-                                                                     @Param("application") String application);
+                                                @Param("application") String application);
 
     @Query("select distinct sgr from SecurityGroupRightEntity sgr " +
             "left join fetch sgr.details " +

@@ -1,6 +1,6 @@
 package com.ote.common.persistence.model;
 
-import com.ote.common.controller.UserPayload;
+import com.ote.common.payload.UserPayload;
 import com.ote.crud.model.IEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
 
 @Entity
 @Getter

@@ -1,9 +1,7 @@
 package com.ote.common.controller;
 
-import com.ote.common.Scope;
-import com.ote.crud.DefaultPersistenceRestController;
-import com.ote.crud.IPersistenceRestController;
-import com.ote.crud.IPersistenceService;
+import com.ote.common.payload.UserPayload;
+import com.ote.common.persistence.service.UserPersistenceRestControllerService;
 import com.ote.crud.exception.CreateException;
 import com.ote.crud.exception.MergeException;
 import com.ote.crud.exception.NotFoundException;
@@ -20,18 +18,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @Slf4j
 @Validated
 public class UserPersistenceRestController {
 
-    // NB: the current RestController implements the interface, endpoints are not visible -> use a delegate
-    private final IPersistenceRestController<UserPayload> defaultController;
-
-    public UserPersistenceRestController(@Autowired IPersistenceService<UserPayload> persistenceService) {
-        defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.User.name());
-    }
+    @Autowired
+    private UserPersistenceRestControllerService persistenceService;
 
     //region >>> Persistence <<<
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +35,7 @@ public class UserPersistenceRestController {
     @ResponseBody
     @PreAuthorize("hasPermission('USER', 'READ')")
     public UserPayload get(@PathVariable("id") long id) throws NotFoundException {
-        return defaultController.get(id);
+        return persistenceService.get(id);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +45,7 @@ public class UserPersistenceRestController {
     public SplitList<UserPayload> get(@RequestParam(required = false) Filters filters,
                                       @RequestParam(required = false) SortingParameters sortingParameters,
                                       @RequestParam(required = false) SplitListParameter splitListParam) {
-        return defaultController.get(filters, sortingParameters, splitListParam);
+        return persistenceService.get(filters, sortingParameters, splitListParam);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -58,7 +54,7 @@ public class UserPersistenceRestController {
     @PreAuthorize("hasPermission('USER', 'WRITE')")
     public UserPayload reset(@PathVariable("id") long id,
                              @RequestBody UserPayload payload) throws ResetException, NotFoundException {
-        return defaultController.reset(id, payload);
+        return persistenceService.reset(id, payload);
     }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -67,7 +63,7 @@ public class UserPersistenceRestController {
     @PreAuthorize("hasPermission('USER', 'WRITE')")
     public UserPayload merge(@PathVariable("id") long id,
                              @RequestBody UserPayload payload) throws MergeException, NotFoundException {
-        return defaultController.merge(id, payload);
+        return persistenceService.merge(id, payload);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -75,21 +71,39 @@ public class UserPersistenceRestController {
     @ResponseBody
     @PreAuthorize("hasPermission('USER', 'WRITE')")
     public UserPayload create(@RequestBody UserPayload payload) throws CreateException {
-        return defaultController.create(payload);
+        return persistenceService.create(payload);
     }
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasPermission('USER', 'WRITE')")
     public void delete(@PathVariable("id") long id) {
-        defaultController.delete(id);
+        persistenceService.delete(id);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasPermission('USER', 'WRITE')")
     public void delete(@RequestParam(required = false) Filters filters) {
-        defaultController.delete(filters);
+        persistenceService.delete(filters);
+    }
+    //endregion
+
+    //region >>> add securityGroups<<<
+    @PutMapping(value = "/{id}/securityGroups")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @PreAuthorize("hasPermission('USER', 'WRITE')")
+    public void addGroups(@PathVariable("id") Long id, @RequestBody String securityGroup) throws NotFoundException {
+        persistenceService.addSecurityGroup(id, securityGroup);
+    }
+
+    @DeleteMapping(value = "/{id}/securityGroups")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    @PreAuthorize("hasPermission('USER', 'WRITE')")
+    public void removeUsers(@PathVariable("id") Long id, @RequestBody String securityGroup) throws NotFoundException {
+        persistenceService.removeSecurityGroup(id, securityGroup);
     }
     //endregion
 }

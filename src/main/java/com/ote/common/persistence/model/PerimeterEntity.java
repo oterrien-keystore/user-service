@@ -1,6 +1,6 @@
 package com.ote.common.persistence.model;
 
-import com.ote.common.controller.PerimeterPayload;
+import com.ote.common.payload.PerimeterPayload;
 import com.ote.crud.model.IEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

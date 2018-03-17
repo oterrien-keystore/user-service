@@ -1,4 +1,4 @@
-package com.ote.mock;
+package com.ote.common.persistence.init;
 
 import com.ote.common.persistence.model.*;
 import com.ote.common.persistence.repository.*;
@@ -8,7 +8,7 @@ import com.ote.user.rights.api.Path;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-@Profile("mockUserRightData")
 @Service
+@ConditionalOnProperty(name = "spring.datasource.initialize", havingValue = "true")
 @Slf4j
 public class UserRightDataInitializer {
 
@@ -61,8 +61,8 @@ public class UserRightDataInitializer {
         log.warn("###### MOCK ##### Init database with samples");
 
         // Create Users
-        createUsers(
-                new User("olivier.terrien", "password"));
+        createUsers(new User("olivier.terrien", "password"),
+                new User("steve.jobs", "password"));
 
         // Create Applications
         createApplications("TEST_SERVICE", "USER_SERVICE");
@@ -95,8 +95,8 @@ public class UserRightDataInitializer {
             log.warn("###### MOCK ##### Clean database");
             securityGroupRightDetailRepository.deleteAll();
             securityGroupRightRepository.deleteAll();
-            securityGroupRepository.deleteAll();
             userRepository.deleteAll();
+            securityGroupRepository.deleteAll();
             applicationRepository.deleteAll();
             perimeterRepository.deleteAll();
             privilegeRepository.deleteAll();
@@ -220,7 +220,7 @@ public class UserRightDataInitializer {
                 forEach(p -> {
                     SecurityGroupRightEntity securityGroupRightEntity;
                     if (securityGroupRightRepository.existsBySecurityGroupCodeAndApplicationCode(p.code, p.application)) {
-                        securityGroupRightEntity = securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCode(p.code, p.application);
+                        securityGroupRightEntity = securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCodeWithDetails(p.code, p.application);
                     } else {
                         securityGroupRightEntity = new SecurityGroupRightEntity();
                         securityGroupRightEntity.setSecurityGroup(securityGroupRepository.findByCode(p.code));

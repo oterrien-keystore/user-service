@@ -1,9 +1,7 @@
 package com.ote.common.controller;
 
-import com.ote.common.Scope;
-import com.ote.crud.DefaultPersistenceRestController;
-import com.ote.crud.IPersistenceRestController;
-import com.ote.crud.IPersistenceService;
+import com.ote.common.payload.PrivilegePayload;
+import com.ote.common.persistence.service.PrivilegePersistenceRestControllerService;
 import com.ote.crud.exception.CreateException;
 import com.ote.crud.exception.MergeException;
 import com.ote.crud.exception.NotFoundException;
@@ -25,12 +23,8 @@ import javax.validation.constraints.NotNull;
 @Validated
 public class PrivilegePersistenceRestController {
 
-    // NB: when the current RestController implements the interface, endpoints are not visible -> use a delegate
-    private final IPersistenceRestController<PrivilegePayload> defaultController;
-
-    public PrivilegePersistenceRestController(@Autowired IPersistenceService<PrivilegePayload> persistenceService) {
-        defaultController = new DefaultPersistenceRestController<>(persistenceService, Scope.Privilege.name());
-    }
+    @Autowired
+    private PrivilegePersistenceRestControllerService persistenceService;
 
     //region >>> Persistence <<<
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,7 +32,7 @@ public class PrivilegePersistenceRestController {
     @ResponseBody
     @PreAuthorize("hasPermission('PRIVILEGE', 'READ')")
     public PrivilegePayload get(@PathVariable("id") long id) throws NotFoundException {
-        return defaultController.get(id);
+        return persistenceService.get(id);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,7 +42,7 @@ public class PrivilegePersistenceRestController {
     public SplitList<PrivilegePayload> get(@RequestParam(required = false) Filters filters,
                                            @RequestParam(required = false) SortingParameters sortingParameters,
                                            @RequestParam(required = false) SplitListParameter splitListParam) {
-        return defaultController.get(filters, sortingParameters, splitListParam);
+        return persistenceService.get(filters, sortingParameters, splitListParam);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -57,7 +51,7 @@ public class PrivilegePersistenceRestController {
     @PreAuthorize("hasPermission('PRIVILEGE', 'WRITE')")
     public PrivilegePayload reset(@PathVariable("id") long id,
                                   @RequestBody @NotNull @Validated(IPayload.ResettingValidationType.class) PrivilegePayload payload) throws ResetException, NotFoundException {
-        return defaultController.reset(id, payload);
+        return persistenceService.reset(id, payload);
     }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -66,7 +60,7 @@ public class PrivilegePersistenceRestController {
     @PreAuthorize("hasPermission('PRIVILEGE', 'WRITE')")
     public PrivilegePayload merge(@PathVariable("id") long id,
                                   @RequestBody @NotNull @Validated(IPayload.MergingValidationType.class) PrivilegePayload payload) throws MergeException, NotFoundException {
-        return defaultController.merge(id, payload);
+        return persistenceService.merge(id, payload);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -74,21 +68,21 @@ public class PrivilegePersistenceRestController {
     @ResponseBody
     @PreAuthorize("hasPermission('PRIVILEGE', 'WRITE')")
     public PrivilegePayload create(@RequestBody @NotNull @Validated(IPayload.CreatingValidationType.class) PrivilegePayload payload) throws CreateException {
-        return defaultController.create(payload);
+        return persistenceService.create(payload);
     }
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasPermission('PRIVILEGE', 'WRITE')")
     public void delete(@PathVariable("id") long id) {
-        defaultController.delete(id);
+        persistenceService.delete(id);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasPermission('PRIVILEGE', 'ADMIN')")
     public void delete(@RequestParam(required = false) Filters filters) {
-        defaultController.delete(filters);
+        persistenceService.delete(filters);
     }
     //endregion
 }

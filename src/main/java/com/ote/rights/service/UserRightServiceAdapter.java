@@ -2,14 +2,12 @@ package com.ote.rights.service;
 
 import com.ote.user.rights.api.IRightCheckerService;
 import com.ote.user.rights.api.RightServiceProvider;
-import com.ote.user.rights.api.exception.UserRightServiceException;
+import com.ote.user.rights.api.exception.*;
 import com.ote.user.rights.spi.IRightCheckerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Profile("!mockUserRight")
 @Service
 @Slf4j
 public class UserRightServiceAdapter implements IRightCheckerService {
@@ -21,7 +19,8 @@ public class UserRightServiceAdapter implements IRightCheckerService {
     }
 
     @Override
-    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, String perimeter, String privilege) throws UserRightServiceException {
+    public boolean doesUserOwnPrivilegeForApplicationOnPerimeter(String user, String application, String perimeter, String privilege)
+            throws ApplicationNotFoundException, PerimeterNotFoundException, PrivilegeNotFoundException, UserNotFoundException, RightNotFoundException {
         return userRightService.doesUserOwnPrivilegeForApplicationOnPerimeter(user, application, perimeter, privilege);
     }
 

@@ -1,8 +1,5 @@
 package com.ote.common.persistence.model;
 
-import com.ote.common.controller.SecurityGroupPayload;
-import com.ote.crud.model.IEntity;
-import com.ote.crud.model.IPayload;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

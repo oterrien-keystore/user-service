@@ -211,7 +211,7 @@ public class DataConfigurationMock {
                 forEach(p -> {
                     SecurityGroupRightEntity securityGroupRightEntity;
                     if (securityGroupRightRepository.existsBySecurityGroupCodeAndApplicationCode(p.code, p.application)) {
-                        securityGroupRightEntity = securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCode(p.code, p.application);
+                        securityGroupRightEntity = securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCodeWithDetails(p.code, p.application);
                     } else {
                         securityGroupRightEntity = new SecurityGroupRightEntity();
                         securityGroupRightEntity.setSecurityGroup(securityGroupRepository.findByCode(p.code));

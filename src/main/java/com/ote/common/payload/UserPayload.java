@@ -1,4 +1,4 @@
-package com.ote.common.controller;
+package com.ote.common.payload;
 
 import com.ote.common.persistence.model.UserEntity;
 import com.ote.crud.model.IPayload;

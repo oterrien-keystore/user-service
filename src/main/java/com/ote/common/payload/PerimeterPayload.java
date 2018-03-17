@@ -1,22 +1,24 @@
-package com.ote.common.controller;
+package com.ote.common.payload;
 
-import com.ote.common.persistence.model.ApplicationEntity;
+import com.ote.common.persistence.model.PerimeterEntity;
 import com.ote.crud.model.IPayload;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
-public class ApplicationPayload implements IPayload {
+public class PerimeterPayload implements IPayload {
 
     private long id;
 
     private String code;
 
     @Override
-    public ApplicationEntity convert() {
-        ApplicationEntity entity = new ApplicationEntity();
+    public PerimeterEntity convert() {
+        PerimeterEntity entity = new PerimeterEntity();
         entity.setId(getId());
         entity.setCode(getCode());
         return entity;

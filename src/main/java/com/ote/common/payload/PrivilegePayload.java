@@ -1,4 +1,4 @@
-package com.ote.common.controller;
+package com.ote.common.payload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ote.common.persistence.model.PrivilegeEntity;
