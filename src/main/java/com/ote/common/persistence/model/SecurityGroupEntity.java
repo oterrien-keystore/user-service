@@ -10,6 +10,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -43,6 +44,7 @@ public class SecurityGroupEntity implements IEntity, Serializable {
         SecurityGroupPayload payload = new SecurityGroupPayload();
         payload.setId(getId());
         payload.setCode(getCode());
+        payload.getUsers().addAll(getUsers().stream().map(UserEntity::convert).collect(Collectors.toSet()));
         return payload;
     }
 }

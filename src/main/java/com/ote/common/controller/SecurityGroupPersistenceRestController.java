@@ -2,6 +2,7 @@ package com.ote.common.controller;
 
 import com.ote.common.payload.RightPayload;
 import com.ote.common.payload.SecurityGroupPayload;
+import com.ote.common.payload.UserPayload;
 import com.ote.common.persistence.service.SecurityGroupPersistenceRestControllerService;
 import com.ote.crud.exception.CreateException;
 import com.ote.crud.exception.MergeException;
@@ -34,8 +35,10 @@ public class SecurityGroupPersistenceRestController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasPermission('SECURITY_GROUP', 'READ')")
-    public SecurityGroupPayload get(@PathVariable("id") long id, @RequestParam(value = "withRights", defaultValue = "False") boolean withRights) throws NotFoundException {
-        return persistenceService.get(id, withRights);
+    public SecurityGroupPayload get(@PathVariable("id") long id,
+                                    @RequestParam(value = "withRights", defaultValue = "false") boolean withRights,
+                                    @RequestParam(value = "withUsers", defaultValue = "false") boolean withUsers) throws NotFoundException {
+        return persistenceService.get(id, withRights, withUsers);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -94,7 +97,7 @@ public class SecurityGroupPersistenceRestController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasPermission('SECURITY_GROUP', 'READ')")
-    public List<RightPayload> getRights(@PathVariable("id") Long id) throws NotFoundException {
+    public List<RightPayload> getRights(@PathVariable("id") long id) throws NotFoundException {
         return persistenceService.getRights(id);
     }
 
@@ -102,7 +105,7 @@ public class SecurityGroupPersistenceRestController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasPermission('SECURITY_GROUP', 'WRITE')")
-    public void addRight(@PathVariable("id") Long id, @RequestBody @Valid RightPayload payload) throws NotFoundException {
+    public void addRight(@PathVariable("id") long id, @RequestBody @Valid RightPayload payload) throws NotFoundException {
         persistenceService.addRight(id, payload);
     }
 
@@ -110,7 +113,7 @@ public class SecurityGroupPersistenceRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     @PreAuthorize("hasPermission('SECURITY_GROUP', 'WRITE')")
-    public void removeRight(@PathVariable("id") Long id, @RequestBody @Valid RightPayload payload) throws NotFoundException {
+    public void removeRight(@PathVariable("id") long id, @RequestBody @Valid RightPayload payload) throws NotFoundException {
         persistenceService.removeRight(id, payload);
     }
     // endregion
@@ -120,7 +123,7 @@ public class SecurityGroupPersistenceRestController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasPermission('SECURITY_GROUP', 'READ')")
-    public List<String> getUsers(@PathVariable("id") Long id) throws NotFoundException {
+    public List<UserPayload> getUsers(@PathVariable("id") long id) throws NotFoundException {
         return persistenceService.getUsers(id);
     }
 
@@ -128,7 +131,7 @@ public class SecurityGroupPersistenceRestController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasPermission('SECURITY_GROUP', 'WRITE')")
-    public void addUsers(@PathVariable("id") Long id, @RequestBody String user) throws NotFoundException {
+    public void addUser(@PathVariable("id") long id, @RequestBody String user) throws NotFoundException {
         persistenceService.addUser(id, user);
     }
 
@@ -136,7 +139,7 @@ public class SecurityGroupPersistenceRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     @PreAuthorize("hasPermission('SECURITY_GROUP', 'WRITE')")
-    public void removeUsers(@PathVariable("id") Long id, @RequestBody String user) throws NotFoundException {
+    public void removeUser(@PathVariable("id") long id, @RequestBody String user) throws NotFoundException {
         persistenceService.removeUser(id, user);
     }
     //endregion

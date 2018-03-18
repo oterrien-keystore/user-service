@@ -22,11 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SecurityGroupPersistenceRestControllerService implements IPersistenceRestController<SecurityGroupPayload> {
@@ -79,52 +77,34 @@ public class SecurityGroupPersistenceRestControllerService implements IPersisten
         };
     }
 
-    public SecurityGroupPayload get(long id, boolean withDefaults) throws NotFoundException {
+    public SecurityGroupPayload get(long id, boolean withRights, boolean withUsers) throws NotFoundException {
 
         SecurityGroupPayload result = this.get(id);
-        if (withDefaults) {
+        if (withRights) {
             securityGroupRightRepository.findBySecurityGroupCodeWithDetails(result.getCode()).
                     forEach(p -> {
                         p.getDetails().
-                                forEach(p1 -> {
-                                    p1.getPrivileges().forEach(p2 -> {
-                                        RightPayload p3 = new RightPayload();
-                                        p3.setApplication(p.getApplication().getCode());
-                                        p3.setPerimeter(p1.getPerimeter().getCode());
-                                        p3.setPrivilege(p2.getCode());
-                                        result.getRights().add(p3);
-                                    });
-
-                                });
+                                forEach(p1 ->
+                                        p1.getPrivileges().forEach(p2 -> {
+                                            RightPayload p3 = new RightPayload();
+                                            p3.setApplication(p.getApplication().getCode());
+                                            p3.setPerimeter(p1.getPerimeter().getCode());
+                                            p3.setPrivilege(p2.getCode());
+                                            result.getRights().add(p3);
+                                        })
+                                );
                     });
+        }
+        if (!withUsers) {
+            result.getUsers().clear();
         }
         return result;
     }
 
     //region >>> add and remove rights <<<
-    public List<RightPayload> getRights(Long id) throws NotFoundException {
+    public List<RightPayload> getRights(long id) throws NotFoundException {
 
-        SecurityGroupEntity securityGroupEntity = Optional.ofNullable(securityGroupRepository.findOne(id)).orElseThrow(() -> new NotFoundException(scope, id));
-
-        List<SecurityGroupRightEntity> securityGroupRights = securityGroupRightRepository.findBySecurityGroupCodeWithDetails(securityGroupEntity.getCode());
-
-        List<RightPayload> result = new ArrayList<>();
-
-        securityGroupRights.forEach(securityGroupRightEntity -> {
-            String application = securityGroupRightEntity.getApplication().getCode();
-            securityGroupRightEntity.getDetails().forEach(detail -> {
-                String perimeter = detail.getPerimeter().getCode();
-                detail.getPrivileges().forEach(privilege -> {
-                    RightPayload rightPayload = new RightPayload();
-                    rightPayload.setApplication(application);
-                    rightPayload.setPerimeter(perimeter);
-                    rightPayload.setPrivilege(privilege.getCode());
-                    result.add(rightPayload);
-                });
-            });
-        });
-
-        return result;
+        return get(id, true, false).getRights();
     }
 
     public void addRight(long id, RightPayload right) throws NotFoundException {
@@ -181,9 +161,15 @@ public class SecurityGroupPersistenceRestControllerService implements IPersisten
 
         Optional.ofNullable(securityGroupRightRepository.findBySecurityGroupCodeAndApplicationCodeWithDetails(securityGroupEntity.getCode(), right.getApplication())).
                 ifPresent(p -> {
-                    if (p.getDetails().stream().anyMatch(p1 -> p1.getPerimeter().getCode().equalsIgnoreCase(right.getPerimeter()))) {
+                    Optional<SecurityGroupRightDetailEntity> securityGroupRightDetailEntityOpt = p.getDetails().stream().
+                            filter(p1 -> p1.getPerimeter().getCode().equalsIgnoreCase(right.getPerimeter())).
+                            findAny();
+
+                    if (securityGroupRightDetailEntityOpt.isPresent()) {
+                        SecurityGroupRightDetailEntity securityGroupRightDetailEntity = securityGroupRightDetailEntityOpt.get();
                         p.getDetails().removeIf(p1 -> p1.getPerimeter().getCode().equalsIgnoreCase(right.getPerimeter()));
                         if (p.getDetails().isEmpty()) {
+                            securityGroupRightDetailRepository.delete(securityGroupRightDetailEntity.getId());
                             securityGroupRightRepository.delete(p.getId());
                         } else {
                             securityGroupRightRepository.saveAndFlush(p);
@@ -194,13 +180,12 @@ public class SecurityGroupPersistenceRestControllerService implements IPersisten
     //endregion
 
     //region >>> add and remove users <<<
-    public List<String> getUsers(Long id) throws NotFoundException {
+    public List<UserPayload> getUsers(long id) throws NotFoundException {
 
-        SecurityGroupEntity securityGroupEntity = Optional.ofNullable(securityGroupRepository.findOne(id)).orElseThrow(() -> new NotFoundException(scope, id));
-        return securityGroupEntity.getUsers().stream().map(UserEntity::getLogin).collect(Collectors.toList());
+        return get(id, false, true).getUsers();
     }
 
-    public void addUser(Long id, String user) throws NotFoundException {
+    public void addUser(long id, String user) throws NotFoundException {
 
         SecurityGroupEntity securityGroupEntity = Optional.ofNullable(securityGroupRepository.findOne(id)).orElseThrow(() -> new NotFoundException(scope, id));
 
@@ -218,7 +203,7 @@ public class SecurityGroupPersistenceRestControllerService implements IPersisten
         }
     }
 
-    public void removeUser(Long id, String user) throws NotFoundException {
+    public void removeUser(long id, String user) throws NotFoundException {
 
         SecurityGroupEntity securityGroupEntity = Optional.ofNullable(securityGroupRepository.findOne(id)).orElseThrow(() -> new NotFoundException(scope, id));
 

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ISecurityGroupJpaRepository extends IEntityRepository<SecurityGroupEntity> {
 
@@ -18,4 +20,9 @@ public interface ISecurityGroupJpaRepository extends IEntityRepository<SecurityG
             "left join fetch sgr.details sgrd " +
             "where s.code = :code")
     SecurityGroupEntity getByCode(@Param("code") String code);
+
+    @Query("select s from SecurityGroupEntity s " +
+            "inner join fetch s.users u " +
+            "where u.login = :user")
+    List<SecurityGroupEntity> findByUser(@Param("user") String user);
 }

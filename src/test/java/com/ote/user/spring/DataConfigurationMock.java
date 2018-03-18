@@ -61,10 +61,10 @@ public class DataConfigurationMock {
                 new User("user3", "password"));
 
         // Create Applications
-        createApplications("App1", "App2");
+        createApplications("App1", "App2", "User-Service TEST");
 
         // Create Perimeters
-        createPerimeters("PARENT", "PARENT/CHILD");
+        createPerimeters("PARENT", "PARENT/CHILD", "SECURITY_GROUP", "USER");
 
         // Create Privileges
         createPrivileges(
@@ -83,6 +83,8 @@ public class DataConfigurationMock {
         createSecurityGroupRight(
                 new SecurityGroupRight("Admins", "App1", "PARENT", "ADMIN"),
                 new SecurityGroupRight("Admins", "App2", "PARENT", "ADMIN"),
+                new SecurityGroupRight("Admins", "User-Service TEST", "SECURITY_GROUP", "ADMIN"),
+                new SecurityGroupRight("Admins", "User-Service TEST", "USER", "ADMIN"),
                 new SecurityGroupRight("Contributors", "App1", "PARENT", "WRITE"),
                 new SecurityGroupRight("Contributors", "App2", "PARENT/CHILD", "WRITE"),
                 new SecurityGroupRight("Readers", "App1", "PARENT", "READ"));

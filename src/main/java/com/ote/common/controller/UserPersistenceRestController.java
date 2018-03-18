@@ -1,5 +1,6 @@
 package com.ote.common.controller;
 
+import com.ote.common.payload.SecurityGroupPayload;
 import com.ote.common.payload.UserPayload;
 import com.ote.common.persistence.service.UserPersistenceRestControllerService;
 import com.ote.crud.exception.CreateException;
@@ -90,11 +91,19 @@ public class UserPersistenceRestController {
     //endregion
 
     //region >>> add securityGroups<<<
+    @GetMapping(value = "/{id}/securityGroups")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @PreAuthorize("hasPermission('USER', 'READ')")
+    public List<SecurityGroupPayload> getGroups(@PathVariable("id") long id) throws NotFoundException {
+        return persistenceService.getSecurityGroups(id);
+    }
+
     @PutMapping(value = "/{id}/securityGroups")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasPermission('USER', 'WRITE')")
-    public void addGroups(@PathVariable("id") Long id, @RequestBody String securityGroup) throws NotFoundException {
+    public void addGroups(@PathVariable("id") long id, @RequestBody String securityGroup) throws NotFoundException {
         persistenceService.addSecurityGroup(id, securityGroup);
     }
 
@@ -102,7 +111,7 @@ public class UserPersistenceRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     @PreAuthorize("hasPermission('USER', 'WRITE')")
-    public void removeUsers(@PathVariable("id") Long id, @RequestBody String securityGroup) throws NotFoundException {
+    public void removeUsers(@PathVariable("id") long id, @RequestBody String securityGroup) throws NotFoundException {
         persistenceService.removeSecurityGroup(id, securityGroup);
     }
     //endregion

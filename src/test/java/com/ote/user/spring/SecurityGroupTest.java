@@ -3,6 +3,7 @@ package com.ote.user.spring;
 import com.ote.UserServiceRunner;
 import com.ote.common.payload.RightPayload;
 import com.ote.common.payload.SecurityGroupPayload;
+import com.ote.common.payload.UserPayload;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ActiveProfiles({"Test", "mockUserRight"})
 @ExtendWith(SpringExtension.class)
@@ -45,7 +49,7 @@ public class SecurityGroupTest {
 
         securityGroupRestController.addRight(group, application, perimeter, privilege);
 
-        SecurityGroupPayload securityGroupPayload = securityGroupRestController.find(group, true);
+        SecurityGroupPayload securityGroupPayload = securityGroupRestController.find(group, true, false);
 
         RightPayload rightPayload = new RightPayload();
         rightPayload.setApplication(application);
@@ -66,7 +70,7 @@ public class SecurityGroupTest {
 
         securityGroupRestController.removeRight(group, application, perimeter, privilege);
 
-        SecurityGroupPayload securityGroupPayload = securityGroupRestController.find(group, true);
+        SecurityGroupPayload securityGroupPayload = securityGroupRestController.find(group, true, false);
 
         RightPayload rightPayload = new RightPayload();
         rightPayload.setApplication(application);
@@ -76,5 +80,19 @@ public class SecurityGroupTest {
         Assertions.assertThat(securityGroupPayload.getRights().stream().anyMatch(p -> p.equals(rightPayload))).
                 as(description).
                 isEqualTo(expectation);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "Readers, user1, user1 should now belong to group 'Readers'",
+            "Readers, user3, user3 should still belong to group 'Readers'"})
+    @WithMockUser(username = "user1", password = "password")
+    public void addUsers(String group, String user) throws Exception {
+
+        securityGroupRestController.addUser(group, user);
+        List<UserPayload> users = securityGroupRestController.getUsers(group);
+
+        Assertions.assertThat(users.stream().map(UserPayload::getLogin).collect(Collectors.toList())).contains(user);
+
     }
 }
